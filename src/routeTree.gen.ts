@@ -9,38 +9,82 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as RegionsRouteImport } from './routes/regions'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StateSlugRouteImport } from './routes/state.$slug'
 
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegionsRoute = RegionsRouteImport.update({
+  id: '/regions',
+  path: '/regions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StateSlugRoute = StateSlugRouteImport.update({
+  id: '/state/$slug',
+  path: '/state/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/regions': typeof RegionsRoute
+  '/shop': typeof ShopRoute
+  '/state/$slug': typeof StateSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/regions': typeof RegionsRoute
+  '/shop': typeof ShopRoute
+  '/state/$slug': typeof StateSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/regions': typeof RegionsRoute
+  '/shop': typeof ShopRoute
+  '/state/$slug': typeof StateSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/regions' | '/shop' | '/state/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/regions' | '/shop' | '/state/$slug'
+  id: '__root__' | '/' | '/regions' | '/shop' | '/state/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RegionsRoute: typeof RegionsRoute
+  ShopRoute: typeof ShopRoute
+  StateSlugRoute: typeof StateSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/regions': {
+      id: '/regions'
+      path: '/regions'
+      fullPath: '/regions'
+      preLoaderRoute: typeof RegionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/state/$slug': {
+      id: '/state/$slug'
+      path: '/state/$slug'
+      fullPath: '/state/$slug'
+      preLoaderRoute: typeof StateSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RegionsRoute: RegionsRoute,
+  ShopRoute: ShopRoute,
+  StateSlugRoute: StateSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
