@@ -1,0 +1,224 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { adminListProducts, deleteProduct, upsertProduct } from "@/lib/admin.functions";
+import { listStates } from "@/lib/states.functions";
+import { formatINR } from "@/lib/format";
+
+export const Route = createFileRoute("/_authenticated/admin/products")({
+  component: Products,
+});
+
+const emptyForm = {
+  id: undefined as string | undefined,
+  name: "",
+  slug: "",
+  price_inr: 0,
+  description: "",
+  fabric: "",
+  saree_type: "",
+  state_id: "" as string,
+  images: "" as string, // newline-separated URLs
+  featured: false,
+  in_stock: true,
+};
+
+function Products() {
+  const qc = useQueryClient();
+  const products = useQuery({ queryKey: ["admin-products"], queryFn: () => adminListProducts() });
+  const states = useQuery({ queryKey: ["states"], queryFn: () => listStates() });
+  const [form, setForm] = useState({ ...emptyForm });
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function save() {
+    try {
+      await upsertProduct({
+        data: {
+          id: form.id,
+          name: form.name,
+          slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+          price_inr: Number(form.price_inr),
+          description: form.description,
+          fabric: form.fabric || null,
+          saree_type: form.saree_type || null,
+          state_id: form.state_id || null,
+          images: form.images.split(/\r?\n/).map((s) => s.trim()).filter(Boolean),
+          featured: form.featured,
+          in_stock: form.in_stock,
+        },
+      });
+      setForm({ ...emptyForm });
+      setMsg("Saved.");
+      qc.invalidateQueries();
+    } catch (e) {
+      setMsg(e instanceof Error ? e.message : "Save failed");
+    }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this product?")) return;
+    await deleteProduct({ data: { id } });
+    qc.invalidateQueries();
+  }
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
+      <div className="rounded-2xl glass p-6">
+        <h2 className="font-serif text-2xl">{form.id ? "Edit product" : "New product"}</h2>
+        <div className="mt-4 space-y-3 text-sm">
+          <Input label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+          <Input label="Slug (auto if blank)" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} />
+          <Input
+            label="Price (INR)"
+            type="number"
+            value={String(form.price_inr)}
+            onChange={(v) => setForm({ ...form, price_inr: Number(v) })}
+          />
+          <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">State</span>
+            <select
+              value={form.state_id}
+              onChange={(e) => setForm({ ...form, state_id: e.target.value })}
+              className="w-full rounded-md border border-input bg-input/40 px-3 py-2"
+            >
+              <option value="">— select —</option>
+              {states.data?.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </label>
+          <Input label="Saree type" value={form.saree_type} onChange={(v) => setForm({ ...form, saree_type: v })} />
+          <Input label="Fabric" value={form.fabric} onChange={(v) => setForm({ ...form, fabric: v })} />
+          <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+              Image URLs (one per line)
+            </span>
+            <textarea
+              rows={3}
+              value={form.images}
+              onChange={(e) => setForm({ ...form, images: e.target.value })}
+              className="w-full rounded-md border border-input bg-input/40 px-3 py-2 font-mono text-xs"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+              Description
+            </span>
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+            />
+            Featured on home
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.in_stock}
+              onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
+            />
+            In stock
+          </label>
+          <div className="flex gap-2">
+            <button
+              onClick={save}
+              className="flex-1 rounded-full bg-primary py-2 text-sm text-primary-foreground hover:bg-primary-glow"
+            >
+              {form.id ? "Update" : "Create"}
+            </button>
+            {form.id && (
+              <button
+                onClick={() => setForm({ ...emptyForm })}
+                className="rounded-full border border-border/60 px-4 text-sm"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+          {msg && <p className="text-xs text-primary">{msg}</p>}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="font-serif text-2xl">All products</h2>
+        <div className="mt-4 space-y-3">
+          {products.data?.map((p) => (
+            <div key={p.id} className="flex items-center gap-4 rounded-xl glass p-4">
+              <div className="h-16 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
+                {p.images?.[0] && <img src={p.images[0]} alt="" className="h-full w-full object-cover" />}
+              </div>
+              <div className="flex-1">
+                <div className="font-serif">{p.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  {p.saree_type} · {p.in_stock ? "in stock" : "sold out"} {p.featured && "· featured"}
+                </div>
+              </div>
+              <div className="text-sm text-primary">{formatINR(p.price_inr)}</div>
+              <button
+                onClick={() =>
+                  setForm({
+                    id: p.id,
+                    name: p.name,
+                    slug: p.slug,
+                    price_inr: p.price_inr,
+                    description: p.description,
+                    fabric: p.fabric ?? "",
+                    saree_type: p.saree_type ?? "",
+                    state_id: p.state_id ?? "",
+                    images: (p.images ?? []).join("\n"),
+                    featured: p.featured,
+                    in_stock: p.in_stock,
+                  })
+                }
+                className="rounded-full border border-border/60 px-3 py-1 text-xs hover:text-primary"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => remove(p.id)}
+                className="rounded-full border border-border/60 px-3 py-1 text-xs hover:text-destructive"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+          {products.data?.length === 0 && (
+            <p className="text-sm text-muted-foreground">No products yet — add one on the left.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
+      />
+    </label>
+  );
+}
