@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createPublicClient } from "./supabase-public.server";
+import { createPublicClient, resolveImages } from "./supabase-public.server";
 
 export const listStates = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = createPublicClient();
@@ -31,5 +31,9 @@ export const getStateBySlug = createServerFn({ method: "GET" })
       .eq("in_stock", true)
       .order("created_at", { ascending: false });
 
-    return { state, products: products ?? [] };
+    const withImgs = await Promise.all(
+      (products ?? []).map(async (p) => ({ ...p, images: await resolveImages(supabase, p.images) })),
+    );
+
+    return { state, products: withImgs };
   });
