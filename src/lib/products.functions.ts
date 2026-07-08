@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createPublicClient } from "./supabase-public.server";
+import { createPublicClient, resolveImages } from "./supabase-public.server";
 
 export const listProducts = createServerFn({ method: "GET" })
   .inputValidator((input) =>
@@ -22,7 +22,9 @@ export const listProducts = createServerFn({ method: "GET" })
     if (data.limit) q = q.limit(data.limit);
     const { data: rows, error } = await q;
     if (error) throw error;
-    return rows ?? [];
+    return await Promise.all(
+      (rows ?? []).map(async (r) => ({ ...r, images: await resolveImages(supabase, r.images) })),
+    );
   });
 
 export const getProductBySlug = createServerFn({ method: "GET" })
@@ -38,13 +40,15 @@ export const getProductBySlug = createServerFn({ method: "GET" })
     if (error) throw error;
     if (!product) return null;
 
+    const images = await resolveImages(supabase, product.images);
+
     const { data: reviews } = await supabase
       .from("reviews")
       .select("id,rating,body,created_at,user_id")
       .eq("product_id", product.id)
       .order("created_at", { ascending: false });
 
-    return { product, reviews: reviews ?? [] };
+    return { product: { ...product, images }, reviews: reviews ?? [] };
   });
 
 export const searchProducts = createServerFn({ method: "GET" })
@@ -57,5 +61,7 @@ export const searchProducts = createServerFn({ method: "GET" })
       .ilike("name", `%${data.q}%`)
       .eq("in_stock", true)
       .limit(12);
-    return rows ?? [];
+    return await Promise.all(
+      (rows ?? []).map(async (r) => ({ ...r, images: await resolveImages(supabase, r.images) })),
+    );
   });
