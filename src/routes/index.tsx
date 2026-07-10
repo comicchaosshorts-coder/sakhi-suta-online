@@ -154,7 +154,7 @@ function Home() {
           </p>
         </div>
         <div className="rounded-3xl glass p-6">
-          <IndiaMap svg={svg} states={states} />
+          <IndiaMap states={states} />
         </div>
       </section>
     </div>
