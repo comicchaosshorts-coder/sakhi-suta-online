@@ -27,7 +27,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
-  const { settings, svg, states, featured } = data;
+  const { settings, states, featured } = data;
+
   const tagline = settings?.tagline ?? "Elegance Woven in Every Thread";
   const brand = settings?.brand_name ?? "Sakhi Suta";
 
