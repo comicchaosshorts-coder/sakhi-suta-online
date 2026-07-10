@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { getSiteSettings, getMapSvg } from "@/lib/site.functions";
+import { getSiteSettings } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { listProducts } from "@/lib/products.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
