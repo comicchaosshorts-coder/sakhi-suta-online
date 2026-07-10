@@ -10,15 +10,15 @@ import { ProductCard } from "@/components/site/ProductCard";
 const homeQuery = queryOptions({
   queryKey: ["home"],
   queryFn: async () => {
-    const [settings, mapRes, states, featured] = await Promise.all([
+    const [settings, states, featured] = await Promise.all([
       getSiteSettings(),
-      getMapSvg(),
       listStates(),
       listProducts({ data: { featured: true, limit: 8 } }),
     ]);
-    return { settings, svg: mapRes.svg, states, featured };
+    return { settings, states, featured };
   },
 });
+
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery),
