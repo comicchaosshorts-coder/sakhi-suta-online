@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { getMapSvg } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { Link } from "@tanstack/react-router";
@@ -8,10 +7,11 @@ import { Link } from "@tanstack/react-router";
 const q = queryOptions({
   queryKey: ["regions"],
   queryFn: async () => {
-    const [mapRes, states] = await Promise.all([getMapSvg(), listStates()]);
-    return { svg: mapRes.svg, states };
+    const states = await listStates();
+    return { states };
   },
 });
+
 
 export const Route = createFileRoute("/regions")({
   head: () => ({
@@ -38,8 +38,9 @@ function Regions() {
         <h1 className="mt-2 font-serif text-5xl">The Weave of India</h1>
       </div>
       <div className="rounded-3xl glass p-6">
-        <IndiaMap svg={data.svg} states={data.states} />
+        <IndiaMap states={data.states} />
       </div>
+
       <div className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
         {data.states.map((s) => (
           <Link

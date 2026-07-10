@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { getSiteSettings, getMapSvg } from "@/lib/site.functions";
+import { getSiteSettings } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { listProducts } from "@/lib/products.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
@@ -10,15 +10,15 @@ import { ProductCard } from "@/components/site/ProductCard";
 const homeQuery = queryOptions({
   queryKey: ["home"],
   queryFn: async () => {
-    const [settings, mapRes, states, featured] = await Promise.all([
+    const [settings, states, featured] = await Promise.all([
       getSiteSettings(),
-      getMapSvg(),
       listStates(),
       listProducts({ data: { featured: true, limit: 8 } }),
     ]);
-    return { settings, svg: mapRes.svg, states, featured };
+    return { settings, states, featured };
   },
 });
+
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery),
@@ -27,7 +27,8 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
-  const { settings, svg, states, featured } = data;
+  const { settings, states, featured } = data;
+
   const tagline = settings?.tagline ?? "Elegance Woven in Every Thread";
   const brand = settings?.brand_name ?? "Sakhi Suta";
 
@@ -153,7 +154,7 @@ function Home() {
           </p>
         </div>
         <div className="rounded-3xl glass p-6">
-          <IndiaMap svg={svg} states={states} />
+          <IndiaMap states={states} />
         </div>
       </section>
     </div>
