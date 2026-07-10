@@ -38,8 +38,9 @@ function Regions() {
         <h1 className="mt-2 font-serif text-5xl">The Weave of India</h1>
       </div>
       <div className="rounded-3xl glass p-6">
-        <IndiaMap svg={data.svg} states={data.states} />
+        <IndiaMap states={data.states} />
       </div>
+
       <div className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
         {data.states.map((s) => (
           <Link
