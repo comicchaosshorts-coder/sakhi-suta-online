@@ -360,6 +360,16 @@ function Products() {
         </div>
       </div>
     </div>
+    {pending[0] && (
+      <ImageCropper
+        file={pending[0].file}
+        aspect={3 / 4}
+        title={pending[0].replaceIndex !== null ? "Replace image" : "Adjust image"}
+        onCancel={cancelCurrentCrop}
+        onConfirm={onCropConfirm}
+      />
+    )}
+    </>
   );
 }
 
