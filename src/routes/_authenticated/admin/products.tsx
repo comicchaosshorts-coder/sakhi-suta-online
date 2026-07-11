@@ -35,6 +35,7 @@ function Products() {
   const states = useQuery({ queryKey: ["states"], queryFn: () => listStates() });
   const [form, setForm] = useState({ ...emptyForm });
   const [msg, setMsg] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   async function save() {
     try {
@@ -48,7 +49,7 @@ function Products() {
           fabric: form.fabric || null,
           saree_type: form.saree_type || null,
           state_id: form.state_id || null,
-          images: form.images.split(/\r?\n/).map((s) => s.trim()).filter(Boolean),
+          images: form.images,
           featured: form.featured,
           in_stock: form.in_stock,
         },
@@ -59,6 +60,38 @@ function Products() {
     } catch (e) {
       setMsg(e instanceof Error ? e.message : "Save failed");
     }
+  }
+
+  async function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        const { key, uploadUrl } = await createProductImageUploadUrl({
+          data: { filename: file.name },
+        });
+        const put = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+        });
+        if (!put.ok) throw new Error(`Upload failed for ${file.name}`);
+        const { url } = await getPublicProductImageUrl({ data: { key } });
+        if (url) uploaded.push(url);
+      }
+      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(idx: number) {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   }
 
   async function remove(id: string) {
