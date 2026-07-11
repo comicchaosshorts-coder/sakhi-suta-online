@@ -233,7 +233,7 @@ function Products() {
                     fabric: p.fabric ?? "",
                     saree_type: p.saree_type ?? "",
                     state_id: p.state_id ?? "",
-                    images: (p.images ?? []).join("\n"),
+                    images: p.images ?? [],
                     featured: p.featured,
                     in_stock: p.in_stock,
                   })
