@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   adminListProducts,
   createProductImageUploadUrl,
@@ -10,10 +10,13 @@ import {
 } from "@/lib/admin.functions";
 import { listStates } from "@/lib/states.functions";
 import { formatINR } from "@/lib/format";
+import { ImageCropper } from "@/components/site/ImageCropper";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({
   component: Products,
 });
+
+type PendingCrop = { file: File; replaceIndex: number | null };
 
 const emptyForm = {
   id: undefined as string | undefined,
