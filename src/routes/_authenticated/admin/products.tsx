@@ -151,6 +151,7 @@ function Products() {
   }
 
   return (
+    <>
     <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
       <div className="rounded-2xl glass p-6">
         <h2 className="font-serif text-2xl">{form.id ? "Edit product" : "New product"}</h2>
