@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { adminListProducts, deleteProduct, upsertProduct } from "@/lib/admin.functions";
+import {
+  adminListProducts,
+  createProductImageUploadUrl,
+  deleteProduct,
+  getPublicProductImageUrl,
+  upsertProduct,
+} from "@/lib/admin.functions";
 import { listStates } from "@/lib/states.functions";
 import { formatINR } from "@/lib/format";
 
@@ -18,7 +24,7 @@ const emptyForm = {
   fabric: "",
   saree_type: "",
   state_id: "" as string,
-  images: "" as string, // newline-separated URLs
+  images: [] as string[],
   featured: false,
   in_stock: true,
 };
@@ -29,6 +35,7 @@ function Products() {
   const states = useQuery({ queryKey: ["states"], queryFn: () => listStates() });
   const [form, setForm] = useState({ ...emptyForm });
   const [msg, setMsg] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   async function save() {
     try {
@@ -42,7 +49,7 @@ function Products() {
           fabric: form.fabric || null,
           saree_type: form.saree_type || null,
           state_id: form.state_id || null,
-          images: form.images.split(/\r?\n/).map((s) => s.trim()).filter(Boolean),
+          images: form.images,
           featured: form.featured,
           in_stock: form.in_stock,
         },
@@ -53,6 +60,38 @@ function Products() {
     } catch (e) {
       setMsg(e instanceof Error ? e.message : "Save failed");
     }
+  }
+
+  async function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        const { key, uploadUrl } = await createProductImageUploadUrl({
+          data: { filename: file.name },
+        });
+        const put = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+          body: file,
+        });
+        if (!put.ok) throw new Error(`Upload failed for ${file.name}`);
+        const { url } = await getPublicProductImageUrl({ data: { key } });
+        if (url) uploaded.push(url);
+      }
+      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeImage(idx: number) {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   }
 
   async function remove(id: string) {
@@ -89,17 +128,38 @@ function Products() {
           </label>
           <Input label="Saree type" value={form.saree_type} onChange={(v) => setForm({ ...form, saree_type: v })} />
           <Input label="Fabric" value={form.fabric} onChange={(v) => setForm({ ...form, fabric: v })} />
-          <label className="block">
+          <div className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
-              Image URLs (one per line)
+              Catalogue images
             </span>
-            <textarea
-              rows={3}
-              value={form.images}
-              onChange={(e) => setForm({ ...form, images: e.target.value })}
-              className="w-full rounded-md border border-input bg-input/40 px-3 py-2 font-mono text-xs"
-            />
-          </label>
+            {form.images.length > 0 && (
+              <div className="mb-2 grid grid-cols-4 gap-2">
+                {form.images.map((src, i) => (
+                  <div key={i} className="group relative aspect-square overflow-hidden rounded-md bg-secondary">
+                    <img src={src} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute right-1 top-1 rounded-full bg-black/70 px-2 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary">
+              {uploading ? "Uploading…" : "Choose images from gallery"}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={onPickFiles}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+          </div>
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
               Description
@@ -173,7 +233,7 @@ function Products() {
                     fabric: p.fabric ?? "",
                     saree_type: p.saree_type ?? "",
                     state_id: p.state_id ?? "",
-                    images: (p.images ?? []).join("\n"),
+                    images: p.images ?? [],
                     featured: p.featured,
                     in_stock: p.in_stock,
                   })
