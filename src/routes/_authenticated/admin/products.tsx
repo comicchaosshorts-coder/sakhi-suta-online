@@ -183,32 +183,86 @@ function Products() {
               Catalogue images
             </span>
             {form.images.length > 0 && (
-              <div className="mb-2 grid grid-cols-4 gap-2">
+              <div className="mb-2 grid grid-cols-3 gap-2">
                 {form.images.map((src, i) => (
-                  <div key={i} className="group relative aspect-square overflow-hidden rounded-md bg-secondary">
+                  <div key={i} className="group relative aspect-[3/4] overflow-hidden rounded-md bg-secondary">
                     <img src={src} alt="" className="h-full w-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                      className="absolute right-1 top-1 rounded-full bg-black/70 px-2 text-xs text-white opacity-0 transition group-hover:opacity-100"
-                    >
-                      ✕
-                    </button>
+                    <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/70 p-1 opacity-0 transition group-hover:opacity-100">
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveImage(i, -1)}
+                          disabled={i === 0}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white disabled:opacity-30"
+                          title="Move left"
+                        >
+                          ←
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveImage(i, 1)}
+                          disabled={i === form.images.length - 1}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white disabled:opacity-30"
+                          title="Move right"
+                        >
+                          →
+                        </button>
+                      </div>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => triggerReplace(i)}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white"
+                          title="Replace"
+                        >
+                          ↺
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(i)}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white"
+                          title="Remove"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                    {i === 0 && (
+                      <span className="absolute left-1 top-1 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] uppercase tracking-widest text-primary-foreground">
+                        Cover
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
             )}
-            <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary">
-              {uploading ? "Uploading…" : "Choose images from gallery"}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={onPickFiles}
-                disabled={uploading}
-                className="hidden"
-              />
-            </label>
+            <button
+              type="button"
+              onClick={() => addInputRef.current?.click()}
+              disabled={uploading}
+              className="flex w-full cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary disabled:opacity-60"
+            >
+              {uploading ? "Uploading…" : pending.length > 0 ? `Cropping (${pending.length} left)…` : "Add images from gallery"}
+            </button>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              You'll be able to zoom, reposition and choose fill-frame or show-whole-image before each image uploads.
+            </p>
+            <input
+              ref={addInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onPickFiles}
+              className="hidden"
+            />
+            <input
+              ref={replaceInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onPickReplace}
+              className="hidden"
+            />
+          </div>
           </div>
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
