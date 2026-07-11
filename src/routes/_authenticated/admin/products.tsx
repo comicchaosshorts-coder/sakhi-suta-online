@@ -1,7 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { adminListProducts, deleteProduct, upsertProduct } from "@/lib/admin.functions";
+import {
+  adminListProducts,
+  createProductImageUploadUrl,
+  deleteProduct,
+  getPublicProductImageUrl,
+  upsertProduct,
+} from "@/lib/admin.functions";
 import { listStates } from "@/lib/states.functions";
 import { formatINR } from "@/lib/format";
 
