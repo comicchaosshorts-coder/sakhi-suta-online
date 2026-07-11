@@ -39,6 +39,10 @@ function Products() {
   const [form, setForm] = useState({ ...emptyForm });
   const [msg, setMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [pending, setPending] = useState<PendingCrop[]>([]);
+  const addInputRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const replaceIndexRef = useRef<number | null>(null);
 
   async function save() {
     try {
@@ -65,27 +69,56 @@ function Products() {
     }
   }
 
-  async function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
     if (files.length === 0) return;
+    setPending((p) => [...p, ...files.map((f) => ({ file: f, replaceIndex: null }))]);
+  }
+
+  function onPickReplace(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    const idx = replaceIndexRef.current;
+    e.target.value = "";
+    replaceIndexRef.current = null;
+    if (!file || idx === null) return;
+    setPending((p) => [...p, { file, replaceIndex: idx }]);
+  }
+
+  function triggerReplace(idx: number) {
+    replaceIndexRef.current = idx;
+    replaceInputRef.current?.click();
+  }
+
+  async function uploadBlob(blob: Blob, filename: string): Promise<string> {
+    const { key, uploadUrl } = await createProductImageUploadUrl({ data: { filename } });
+    const put = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": blob.type || "image/jpeg" },
+      body: blob,
+    });
+    if (!put.ok) throw new Error(`Upload failed for ${filename}`);
+    const { url } = await getPublicProductImageUrl({ data: { key } });
+    if (!url) throw new Error("Could not resolve uploaded image URL");
+    return url;
+  }
+
+  async function onCropConfirm(blob: Blob, filename: string) {
+    const current = pending[0];
+    if (!current) return;
     setUploading(true);
+    setPending((p) => p.slice(1));
     try {
-      const uploaded: string[] = [];
-      for (const file of files) {
-        const { key, uploadUrl } = await createProductImageUploadUrl({
-          data: { filename: file.name },
-        });
-        const put = await fetch(uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type || "application/octet-stream" },
-          body: file,
-        });
-        if (!put.ok) throw new Error(`Upload failed for ${file.name}`);
-        const { url } = await getPublicProductImageUrl({ data: { key } });
-        if (url) uploaded.push(url);
-      }
-      setForm((f) => ({ ...f, images: [...f.images, ...uploaded] }));
+      const url = await uploadBlob(blob, filename);
+      setForm((f) => {
+        const next = [...f.images];
+        if (current.replaceIndex !== null && current.replaceIndex < next.length) {
+          next[current.replaceIndex] = url;
+        } else {
+          next.push(url);
+        }
+        return { ...f, images: next };
+      });
     } catch (err) {
       setMsg(err instanceof Error ? err.message : "Image upload failed");
     } finally {
@@ -93,8 +126,22 @@ function Products() {
     }
   }
 
+  function cancelCurrentCrop() {
+    setPending((p) => p.slice(1));
+  }
+
   function removeImage(idx: number) {
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
+  }
+
+  function moveImage(idx: number, dir: -1 | 1) {
+    setForm((f) => {
+      const next = [...f.images];
+      const j = idx + dir;
+      if (j < 0 || j >= next.length) return f;
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return { ...f, images: next };
+    });
   }
 
   async function remove(id: string) {
