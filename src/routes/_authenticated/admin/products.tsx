@@ -263,7 +263,6 @@ function Products() {
               className="hidden"
             />
           </div>
-          </div>
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
               Description
