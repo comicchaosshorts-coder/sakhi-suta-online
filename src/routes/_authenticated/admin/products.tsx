@@ -24,7 +24,7 @@ const emptyForm = {
   fabric: "",
   saree_type: "",
   state_id: "" as string,
-  images: "" as string, // newline-separated URLs
+  images: [] as string[],
   featured: false,
   in_stock: true,
 };
