@@ -128,17 +128,38 @@ function Products() {
           </label>
           <Input label="Saree type" value={form.saree_type} onChange={(v) => setForm({ ...form, saree_type: v })} />
           <Input label="Fabric" value={form.fabric} onChange={(v) => setForm({ ...form, fabric: v })} />
-          <label className="block">
+          <div className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
-              Image URLs (one per line)
+              Catalogue images
             </span>
-            <textarea
-              rows={3}
-              value={form.images}
-              onChange={(e) => setForm({ ...form, images: e.target.value })}
-              className="w-full rounded-md border border-input bg-input/40 px-3 py-2 font-mono text-xs"
-            />
-          </label>
+            {form.images.length > 0 && (
+              <div className="mb-2 grid grid-cols-4 gap-2">
+                {form.images.map((src, i) => (
+                  <div key={i} className="group relative aspect-square overflow-hidden rounded-md bg-secondary">
+                    <img src={src} alt="" className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute right-1 top-1 rounded-full bg-black/70 px-2 text-xs text-white opacity-0 transition group-hover:opacity-100"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary">
+              {uploading ? "Uploading…" : "Choose images from gallery"}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={onPickFiles}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+          </div>
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
               Description
