@@ -53,6 +53,7 @@ function Products() {
           name: form.name,
           slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
           price_inr: Number(form.price_inr),
+          compare_at_price_inr: form.compare_at_price_inr ? Number(form.compare_at_price_inr) : null,
           description: form.description,
           fabric: form.fabric || null,
           saree_type: form.saree_type || null,
