@@ -127,12 +127,17 @@ function ProductPage() {
             </div>
           )}
 
-          <div className="mt-6 flex items-baseline gap-3">
+          <div className="mt-6 flex items-baseline flex-wrap gap-3">
             <span className="text-3xl font-semibold text-primary">{formatINR(product.price_inr)}</span>
             {product.compare_at_price_inr && product.compare_at_price_inr > product.price_inr && (
-              <span className="text-muted-foreground line-through">
-                {formatINR(product.compare_at_price_inr)}
-              </span>
+              <>
+                <span className="text-lg text-muted-foreground line-through">
+                  {formatINR(product.compare_at_price_inr)}
+                </span>
+                <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary">
+                  {Math.round(((product.compare_at_price_inr - product.price_inr) / product.compare_at_price_inr) * 100)}% OFF
+                </span>
+              </>
             )}
           </div>
 
