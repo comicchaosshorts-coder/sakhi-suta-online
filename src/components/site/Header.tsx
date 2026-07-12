@@ -4,6 +4,7 @@ import { ShoppingBag, Search, User, Menu, X } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHydrated } from "@/lib/hooks";
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/sakhi-suta-logo.png.asset.json";
 
 export function Header() {
   const hydrated = useHydrated();
