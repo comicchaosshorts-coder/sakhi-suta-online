@@ -7,7 +7,7 @@ export function ImageZoom({ src, alt }: { src: string; alt: string }) {
   return (
     <div
       ref={ref}
-      className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-secondary"
+      className="group relative aspect-[9/16] overflow-hidden rounded-xl bg-secondary"
       onMouseMove={(e) => {
         const r = ref.current!.getBoundingClientRect();
         setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
