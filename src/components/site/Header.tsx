@@ -4,6 +4,7 @@ import { ShoppingBag, Search, User, Menu, X } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHydrated } from "@/lib/hooks";
 import { supabase } from "@/integrations/supabase/client";
+import logoAsset from "@/assets/sakhi-suta-logo.png.asset.json";
 
 export function Header() {
   const hydrated = useHydrated();
@@ -29,10 +30,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-        <Link to="/" className="group flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-full gold-border">
-            <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_12px_var(--color-primary)]" />
-          </span>
+        <Link to="/" className="group flex items-center gap-3">
+          <img
+            src={logoAsset.url}
+            alt="Sakhi Suta — Weaving Bonds, Celebrating Women"
+            className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
+          />
           <span className="font-serif text-2xl leading-none tracking-wide">
             <span className="gold-text">Sakhi</span> Suta
           </span>
