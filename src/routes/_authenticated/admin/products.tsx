@@ -23,6 +23,7 @@ const emptyForm = {
   name: "",
   slug: "",
   price_inr: 0,
+  compare_at_price_inr: 0,
   description: "",
   fabric: "",
   saree_type: "",
