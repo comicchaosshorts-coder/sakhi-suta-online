@@ -23,6 +23,7 @@ const emptyForm = {
   name: "",
   slug: "",
   price_inr: 0,
+  compare_at_price_inr: 0,
   description: "",
   fabric: "",
   saree_type: "",
@@ -52,6 +53,7 @@ function Products() {
           name: form.name,
           slug: form.slug || form.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
           price_inr: Number(form.price_inr),
+          compare_at_price_inr: form.compare_at_price_inr ? Number(form.compare_at_price_inr) : null,
           description: form.description,
           fabric: form.fabric || null,
           saree_type: form.saree_type || null,
@@ -159,11 +161,22 @@ function Products() {
           <Input label="Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
           <Input label="Slug (auto if blank)" value={form.slug} onChange={(v) => setForm({ ...form, slug: v })} />
           <Input
-            label="Price (INR)"
+            label="Discounted price (INR)"
             type="number"
             value={String(form.price_inr)}
             onChange={(v) => setForm({ ...form, price_inr: Number(v) })}
           />
+          <Input
+            label="MRP (INR) — leave 0 for no discount"
+            type="number"
+            value={String(form.compare_at_price_inr)}
+            onChange={(v) => setForm({ ...form, compare_at_price_inr: Number(v) })}
+          />
+          {form.compare_at_price_inr > 0 && form.compare_at_price_inr > form.price_inr && (
+            <p className="text-[11px] text-primary">
+              {Math.round(((form.compare_at_price_inr - form.price_inr) / form.compare_at_price_inr) * 100)}% off will be shown on the storefront.
+            </p>
+          )}
           <label className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">State</span>
             <select
@@ -333,6 +346,7 @@ function Products() {
                     name: p.name,
                     slug: p.slug,
                     price_inr: p.price_inr,
+                    compare_at_price_inr: p.compare_at_price_inr ?? 0,
                     description: p.description,
                     fabric: p.fabric ?? "",
                     saree_type: p.saree_type ?? "",

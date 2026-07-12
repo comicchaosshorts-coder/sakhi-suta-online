@@ -46,12 +46,17 @@ export function ProductCard({ p }: { p: ProductCardData }) {
       <div className="p-4">
         <h3 className="font-serif text-lg leading-tight text-foreground">{p.name}</h3>
         {p.fabric && <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{p.fabric}</p>}
-        <div className="mt-3 flex items-baseline gap-2">
+        <div className="mt-3 flex flex-wrap items-baseline gap-2">
           <span className="text-lg font-semibold text-primary">{formatINR(p.price_inr)}</span>
           {p.compare_at_price_inr && p.compare_at_price_inr > p.price_inr && (
-            <span className="text-xs text-muted-foreground line-through">
-              {formatINR(p.compare_at_price_inr)}
-            </span>
+            <>
+              <span className="text-xs text-muted-foreground line-through">
+                {formatINR(p.compare_at_price_inr)}
+              </span>
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-medium text-primary">
+                {Math.round(((p.compare_at_price_inr - p.price_inr) / p.compare_at_price_inr) * 100)}% OFF
+              </span>
+            </>
           )}
         </div>
       </div>
