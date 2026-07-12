@@ -346,6 +346,7 @@ function Products() {
                     name: p.name,
                     slug: p.slug,
                     price_inr: p.price_inr,
+                    compare_at_price_inr: p.compare_at_price_inr ?? 0,
                     description: p.description,
                     fabric: p.fabric ?? "",
                     saree_type: p.saree_type ?? "",
