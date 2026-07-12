@@ -23,7 +23,7 @@ export function ProductCard({ p }: { p: ProductCardData }) {
       ref={ref}
       className="tilt-card group relative block overflow-hidden rounded-xl glass"
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
+      <div className="relative aspect-[9/16] overflow-hidden bg-secondary">
         {img ? (
           <img
             src={img}

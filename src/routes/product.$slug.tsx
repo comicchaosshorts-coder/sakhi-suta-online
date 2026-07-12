@@ -92,7 +92,7 @@ function ProductPage() {
           {img ? (
             <ImageZoom src={img} alt={product.name} />
           ) : (
-            <div className="grid aspect-[3/4] place-items-center rounded-xl bg-secondary font-serif text-6xl text-primary/40">
+            <div className="grid aspect-[9/16] place-items-center rounded-xl bg-secondary font-serif text-6xl text-primary/40">
               {product.name.charAt(0)}
             </div>
           )}

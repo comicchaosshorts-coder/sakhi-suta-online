@@ -87,7 +87,7 @@ function Account() {
                     className="rounded-xl glass p-3 text-sm hover:text-primary"
                   >
                     {w.products.images?.[0] && (
-                      <img src={w.products.images[0]} alt="" className="aspect-[3/4] w-full rounded-md object-cover" />
+                      <img src={w.products.images[0]} alt="" className="aspect-[9/16] w-full rounded-md object-cover" />
                     )}
                     <div className="mt-2 truncate">{w.products.name}</div>
                     <div className="text-primary">{formatINR(w.products.price_inr)}</div>

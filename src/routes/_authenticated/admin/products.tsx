@@ -199,7 +199,7 @@ function Products() {
             {form.images.length > 0 && (
               <div className="mb-2 grid grid-cols-3 gap-2">
                 {form.images.map((src, i) => (
-                  <div key={i} className="group relative aspect-[3/4] overflow-hidden rounded-md bg-secondary">
+                  <div key={i} className="group relative aspect-[9/16] overflow-hidden rounded-md bg-secondary">
                     <img src={src} alt="" className="h-full w-full object-cover" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/70 p-1 opacity-0 transition group-hover:opacity-100">
                       <div className="flex gap-1">
@@ -377,7 +377,7 @@ function Products() {
     {pending[0] && (
       <ImageCropper
         file={pending[0].file}
-        aspect={3 / 4}
+        aspect={9 / 16}
         title={pending[0].replaceIndex !== null ? "Replace image" : "Adjust image"}
         onCancel={cancelCurrentCrop}
         onConfirm={onCropConfirm}
