@@ -71,20 +71,55 @@ function Products() {
     }
   }
 
-  function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
     if (files.length === 0) return;
-    setPending((p) => [...p, ...files.map((f) => ({ file: f, replaceIndex: null }))]);
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const url = await uploadBlob(file, file.name);
+        setForm((f) => ({ ...f, images: [...f.images, url] }));
+      }
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function onPickReplace(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickReplace(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     const idx = replaceIndexRef.current;
     e.target.value = "";
     replaceIndexRef.current = null;
     if (!file || idx === null) return;
-    setPending((p) => [...p, { file, replaceIndex: idx }]);
+    setUploading(true);
+    try {
+      const url = await uploadBlob(file, file.name);
+      setForm((f) => {
+        const next = [...f.images];
+        if (idx < next.length) next[idx] = url;
+        return { ...f, images: next };
+      });
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function openAdjust(idx: number) {
+    const src = form.images[idx];
+    if (!src) return;
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const file = new File([blob], `image-${idx}.jpg`, { type: blob.type || "image/jpeg" });
+      setPending((p) => [...p, { file, replaceIndex: idx }]);
+    } catch {
+      setMsg("Could not load image for adjusting.");
+    }
   }
 
   function triggerReplace(idx: number) {
@@ -199,8 +234,8 @@ function Products() {
             {form.images.length > 0 && (
               <div className="mb-2 grid grid-cols-3 gap-2">
                 {form.images.map((src, i) => (
-                  <div key={i} className="group relative aspect-[9/16] overflow-hidden rounded-md bg-secondary">
-                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  <div key={i} className="group relative overflow-hidden rounded-md bg-secondary">
+                    <img src={src} alt="" className="block h-auto w-full object-contain" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/70 p-1 opacity-0 transition group-hover:opacity-100">
                       <div className="flex gap-1">
                         <button
@@ -223,6 +258,14 @@ function Products() {
                         </button>
                       </div>
                       <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => openAdjust(i)}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white"
+                          title="Adjust / crop"
+                        >
+                          ✎
+                        </button>
                         <button
                           type="button"
                           onClick={() => triggerReplace(i)}
@@ -256,10 +299,10 @@ function Products() {
               disabled={uploading}
               className="flex w-full cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary disabled:opacity-60"
             >
-              {uploading ? "Uploading…" : pending.length > 0 ? `Cropping (${pending.length} left)…` : "Add images from gallery"}
+              {uploading ? "Uploading…" : "Add images from gallery"}
             </button>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              You'll be able to zoom, reposition and choose fill-frame or show-whole-image before each image uploads.
+              Images upload at their original aspect — nothing is cropped. Use ✎ on a thumbnail if you'd like to reframe one.
             </p>
             <input
               ref={addInputRef}
