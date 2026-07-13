@@ -89,6 +89,14 @@ export const uploadMapSvg = createServerFn({ method: "POST" })
   });
 
 // ---- PRODUCTS ----
+const VariantInput = z.object({
+  id: z.string().min(1).max(60),
+  name: z.string().min(1).max(100),
+  description: z.string().max(2000).default(""),
+  price_inr: z.number().int().min(0),
+  compare_at_price_inr: z.number().int().min(0).nullable().optional(),
+});
+
 const ProductInput = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1).max(200),
@@ -105,6 +113,7 @@ const ProductInput = z.object({
   saree_type: z.string().max(100).optional().nullable(),
   in_stock: z.boolean().default(true),
   featured: z.boolean().default(false),
+  variants: z.array(VariantInput).max(30).default([]),
 });
 
 export const upsertProduct = createServerFn({ method: "POST" })
