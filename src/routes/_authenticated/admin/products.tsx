@@ -299,10 +299,10 @@ function Products() {
               disabled={uploading}
               className="flex w-full cursor-pointer items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-4 text-xs text-muted-foreground hover:border-primary hover:text-primary disabled:opacity-60"
             >
-              {uploading ? "Uploading…" : pending.length > 0 ? `Cropping (${pending.length} left)…` : "Add images from gallery"}
+              {uploading ? "Uploading…" : "Add images from gallery"}
             </button>
             <p className="mt-1 text-[11px] text-muted-foreground">
-              You'll be able to zoom, reposition and choose fill-frame or show-whole-image before each image uploads.
+              Images upload at their original aspect — nothing is cropped. Use ✎ on a thumbnail if you'd like to reframe one.
             </p>
             <input
               ref={addInputRef}
