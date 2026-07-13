@@ -351,6 +351,120 @@ function Products() {
               className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
             />
           </label>
+
+          <div className="block">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                Variants ({form.variants.length})
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    variants: [
+                      ...f.variants,
+                      {
+                        id: newVariantId(),
+                        name: "",
+                        description: "",
+                        price_inr: f.price_inr || 0,
+                        compare_at_price_inr: f.compare_at_price_inr || 0,
+                      },
+                    ],
+                  }))
+                }
+                className="rounded-full border border-primary/60 px-3 py-1 text-[11px] text-primary hover:bg-primary/10"
+              >
+                + Add variant
+              </button>
+            </div>
+            {form.variants.length === 0 && (
+              <p className="text-[11px] text-muted-foreground">
+                Optional. Add variants (e.g. colours, blouse sizes) — each with its own description and price.
+              </p>
+            )}
+            <div className="space-y-3">
+              {form.variants.map((v, idx) => (
+                <div key={v.id} className="space-y-2 rounded-lg border border-border/50 bg-input/20 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-widest text-muted-foreground">
+                      Variant {idx + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((f) => ({
+                          ...f,
+                          variants: f.variants.filter((_, i) => i !== idx),
+                        }))
+                      }
+                      className="rounded border border-border/60 px-2 py-0.5 text-[10px] hover:text-destructive"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <Input
+                    label="Variant name"
+                    value={v.name}
+                    onChange={(val) =>
+                      setForm((f) => ({
+                        ...f,
+                        variants: f.variants.map((x, i) => (i === idx ? { ...x, name: val } : x)),
+                      }))
+                    }
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      label="Price (INR)"
+                      type="number"
+                      value={String(v.price_inr)}
+                      onChange={(val) =>
+                        setForm((f) => ({
+                          ...f,
+                          variants: f.variants.map((x, i) =>
+                            i === idx ? { ...x, price_inr: Number(val) } : x,
+                          ),
+                        }))
+                      }
+                    />
+                    <Input
+                      label="MRP (INR)"
+                      type="number"
+                      value={String(v.compare_at_price_inr)}
+                      onChange={(val) =>
+                        setForm((f) => ({
+                          ...f,
+                          variants: f.variants.map((x, i) =>
+                            i === idx ? { ...x, compare_at_price_inr: Number(val) } : x,
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                  <label className="block">
+                    <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+                      Variant description
+                    </span>
+                    <textarea
+                      rows={2}
+                      value={v.description}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          variants: f.variants.map((x, i) =>
+                            i === idx ? { ...x, description: e.target.value } : x,
+                          ),
+                        }))
+                      }
+                      className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
+                    />
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
