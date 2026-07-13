@@ -53,9 +53,24 @@ function ProductPage() {
   const add = useCart((s) => s.add);
   const [wishBusy, setWishBusy] = useState(false);
   const [wishSaved, setWishSaved] = useState(false);
+  const [variantIdx, setVariantIdx] = useState(0);
 
   if (!data) return null;
   const { product, reviews } = data;
+  const rawVariants = Array.isArray((product as any).variants) ? (product as any).variants : [];
+  const variants = rawVariants as Array<{
+    id: string;
+    name: string;
+    description?: string;
+    price_inr: number;
+    compare_at_price_inr?: number | null;
+  }>;
+  const activeVariant = variants[variantIdx];
+  const displayPrice = activeVariant ? activeVariant.price_inr : product.price_inr;
+  const displayCompare = activeVariant
+    ? activeVariant.compare_at_price_inr ?? null
+    : product.compare_at_price_inr;
+  const displayDescription = activeVariant?.description || product.description;
   const img = product.images?.[selected] || product.images?.[0];
   const avgRating =
     reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
@@ -78,9 +93,11 @@ function ProductPage() {
   function handleAdd() {
     add({
       productId: product.id,
+      variantId: activeVariant?.id ?? null,
+      variantName: activeVariant?.name ?? null,
       name: product.name,
       slug: product.slug,
-      price_inr: product.price_inr,
+      price_inr: displayPrice,
       image: img,
     });
   }
@@ -128,21 +145,44 @@ function ProductPage() {
           )}
 
           <div className="mt-6 flex items-baseline flex-wrap gap-3">
-            <span className="text-3xl font-semibold text-primary">{formatINR(product.price_inr)}</span>
-            {product.compare_at_price_inr && product.compare_at_price_inr > product.price_inr && (
+            <span className="text-3xl font-semibold text-primary">{formatINR(displayPrice)}</span>
+            {displayCompare && displayCompare > displayPrice && (
               <>
                 <span className="text-lg text-muted-foreground line-through">
-                  {formatINR(product.compare_at_price_inr)}
+                  {formatINR(displayCompare)}
                 </span>
                 <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary">
-                  {Math.round(((product.compare_at_price_inr - product.price_inr) / product.compare_at_price_inr) * 100)}% OFF
+                  {Math.round(((displayCompare - displayPrice) / displayCompare) * 100)}% OFF
                 </span>
               </>
             )}
           </div>
 
+          {variants.length > 0 && (
+            <div className="mt-6">
+              <p className="mb-2 text-[11px] uppercase tracking-widest text-muted-foreground">
+                Choose variant
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v, i) => (
+                  <button
+                    key={v.id}
+                    onClick={() => setVariantIdx(i)}
+                    className={`rounded-full border px-4 py-2 text-xs transition ${
+                      variantIdx === i
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border/60 hover:border-primary/60"
+                    }`}
+                  >
+                    {v.name} · {formatINR(v.price_inr)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-            {product.description || "A handloom saree woven with reverence for tradition."}
+            {displayDescription || "A handloom saree woven with reverence for tradition."}
           </p>
 
           <dl className="mt-8 grid grid-cols-2 gap-4 text-sm">

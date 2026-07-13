@@ -80,6 +80,7 @@ export type Database = {
           slug: string
           state_id: string | null
           updated_at: string
+          variants: Json
           work: string | null
         }
         Insert: {
@@ -99,6 +100,7 @@ export type Database = {
           slug: string
           state_id?: string | null
           updated_at?: string
+          variants?: Json
           work?: string | null
         }
         Update: {
@@ -118,6 +120,7 @@ export type Database = {
           slug?: string
           state_id?: string | null
           updated_at?: string
+          variants?: Json
           work?: string | null
         }
         Relationships: [
