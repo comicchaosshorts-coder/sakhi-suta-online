@@ -34,8 +34,10 @@ function CartPage() {
       ) : (
         <div className="mt-8 grid gap-8 md:grid-cols-[1fr_320px]">
           <div className="space-y-4">
-            {items.map((i) => (
-              <div key={i.productId} className="flex gap-4 rounded-xl glass p-4">
+            {items.map((i) => {
+              const k = cartKey(i);
+              return (
+              <div key={k} className="flex gap-4 rounded-xl glass p-4">
                 <div className="h-24 w-20 shrink-0 overflow-hidden rounded-md bg-secondary">
                   {i.image && <img src={i.image} alt="" className="h-full w-full object-cover" />}
                 </div>
@@ -44,26 +46,30 @@ function CartPage() {
                     <Link to="/product/$slug" params={{ slug: i.slug }} className="font-serif text-lg hover:text-primary">
                       {i.name}
                     </Link>
+                    {i.variantName && (
+                      <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{i.variantName}</p>
+                    )}
                     <p className="text-sm text-primary">{formatINR(i.price_inr)}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center rounded-full gold-border">
-                      <button onClick={() => setQty(i.productId, i.quantity - 1)} className="p-2">
+                      <button onClick={() => setQty(k, i.quantity - 1)} className="p-2">
                         <Minus className="h-3 w-3" />
                       </button>
                       <span className="w-8 text-center text-sm">{i.quantity}</span>
-                      <button onClick={() => setQty(i.productId, i.quantity + 1)} className="p-2">
+                      <button onClick={() => setQty(k, i.quantity + 1)} className="p-2">
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
-                    <button onClick={() => remove(i.productId)} className="text-muted-foreground hover:text-destructive">
+                    <button onClick={() => remove(k)} className="text-muted-foreground hover:text-destructive">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
                 <div className="text-right font-semibold">{formatINR(i.price_inr * i.quantity)}</div>
               </div>
-            ))}
+              );
+            })}
           </div>
           <div className="h-fit rounded-xl glass p-6">
             <h2 className="font-serif text-2xl">Summary</h2>
