@@ -74,6 +74,13 @@ function Products() {
           images: form.images,
           featured: form.featured,
           in_stock: form.in_stock,
+          variants: form.variants.map((v) => ({
+            id: v.id,
+            name: v.name,
+            description: v.description,
+            price_inr: Number(v.price_inr),
+            compare_at_price_inr: v.compare_at_price_inr ? Number(v.compare_at_price_inr) : null,
+          })),
         },
       });
       setForm({ ...emptyForm });
