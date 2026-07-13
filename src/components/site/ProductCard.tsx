@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTilt } from "@/lib/hooks";
 import { formatINR } from "@/lib/format";
+import { AutoImage } from "@/components/site/AutoImage";
 
 export type ProductCardData = {
   id: string;
@@ -23,16 +24,15 @@ export function ProductCard({ p }: { p: ProductCardData }) {
       ref={ref}
       className="tilt-card group relative block overflow-hidden rounded-xl glass"
     >
-      <div className="relative aspect-[9/16] overflow-hidden bg-secondary">
+      <div className="relative overflow-hidden bg-secondary">
         {img ? (
-          <img
+          <AutoImage
             src={img}
             alt={p.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            imgClassName="transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center font-serif text-primary/40">
+          <div className="flex aspect-[9/16] w-full items-center justify-center font-serif text-primary/40">
             {p.name.charAt(0)}
           </div>
         )}
