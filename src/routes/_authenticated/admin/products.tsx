@@ -18,6 +18,14 @@ export const Route = createFileRoute("/_authenticated/admin/products")({
 
 type PendingCrop = { file: File; replaceIndex: number | null };
 
+type VariantForm = {
+  id: string;
+  name: string;
+  description: string;
+  price_inr: number;
+  compare_at_price_inr: number;
+};
+
 const emptyForm = {
   id: undefined as string | undefined,
   name: "",
@@ -31,7 +39,12 @@ const emptyForm = {
   images: [] as string[],
   featured: false,
   in_stock: true,
+  variants: [] as VariantForm[],
 };
+
+function newVariantId() {
+  return `v_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
 
 function Products() {
   const qc = useQueryClient();
