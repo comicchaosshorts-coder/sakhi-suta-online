@@ -417,6 +417,15 @@ function Products() {
                     images: p.images ?? [],
                     featured: p.featured,
                     in_stock: p.in_stock,
+                    variants: Array.isArray((p as any).variants)
+                      ? ((p as any).variants as any[]).map((v) => ({
+                          id: String(v.id ?? newVariantId()),
+                          name: String(v.name ?? ""),
+                          description: String(v.description ?? ""),
+                          price_inr: Number(v.price_inr ?? 0),
+                          compare_at_price_inr: Number(v.compare_at_price_inr ?? 0),
+                        }))
+                      : [],
                   })
                 }
                 className="rounded-full border border-border/60 px-3 py-1 text-xs hover:text-primary"
