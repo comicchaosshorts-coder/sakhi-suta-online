@@ -53,9 +53,24 @@ function ProductPage() {
   const add = useCart((s) => s.add);
   const [wishBusy, setWishBusy] = useState(false);
   const [wishSaved, setWishSaved] = useState(false);
+  const [variantIdx, setVariantIdx] = useState(0);
 
   if (!data) return null;
   const { product, reviews } = data;
+  const rawVariants = Array.isArray((product as any).variants) ? (product as any).variants : [];
+  const variants = rawVariants as Array<{
+    id: string;
+    name: string;
+    description?: string;
+    price_inr: number;
+    compare_at_price_inr?: number | null;
+  }>;
+  const activeVariant = variants[variantIdx];
+  const displayPrice = activeVariant ? activeVariant.price_inr : product.price_inr;
+  const displayCompare = activeVariant
+    ? activeVariant.compare_at_price_inr ?? null
+    : product.compare_at_price_inr;
+  const displayDescription = activeVariant?.description || product.description;
   const img = product.images?.[selected] || product.images?.[0];
   const avgRating =
     reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
@@ -78,9 +93,11 @@ function ProductPage() {
   function handleAdd() {
     add({
       productId: product.id,
+      variantId: activeVariant?.id ?? null,
+      variantName: activeVariant?.name ?? null,
       name: product.name,
       slug: product.slug,
-      price_inr: product.price_inr,
+      price_inr: displayPrice,
       image: img,
     });
   }
