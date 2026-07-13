@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCart } from "@/lib/cart-store";
+import { useCart, cartKey } from "@/lib/cart-store";
 import { formatINR } from "@/lib/format";
 import { useHydrated } from "@/lib/hooks";
 import { Minus, Plus, Trash2 } from "lucide-react";
