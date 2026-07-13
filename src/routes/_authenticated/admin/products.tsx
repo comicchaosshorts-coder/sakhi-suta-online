@@ -234,8 +234,8 @@ function Products() {
             {form.images.length > 0 && (
               <div className="mb-2 grid grid-cols-3 gap-2">
                 {form.images.map((src, i) => (
-                  <div key={i} className="group relative aspect-[9/16] overflow-hidden rounded-md bg-secondary">
-                    <img src={src} alt="" className="h-full w-full object-cover" />
+                  <div key={i} className="group relative overflow-hidden rounded-md bg-secondary">
+                    <img src={src} alt="" className="block h-auto w-full object-contain" />
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/70 p-1 opacity-0 transition group-hover:opacity-100">
                       <div className="flex gap-1">
                         <button
@@ -258,6 +258,14 @@ function Products() {
                         </button>
                       </div>
                       <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => openAdjust(i)}
+                          className="rounded bg-white/10 px-1.5 text-[11px] text-white"
+                          title="Adjust / crop"
+                        >
+                          ✎
+                        </button>
                         <button
                           type="button"
                           onClick={() => triggerReplace(i)}
