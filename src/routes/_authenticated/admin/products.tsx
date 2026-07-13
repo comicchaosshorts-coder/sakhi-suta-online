@@ -71,20 +71,55 @@ function Products() {
     }
   }
 
-  function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = "";
     if (files.length === 0) return;
-    setPending((p) => [...p, ...files.map((f) => ({ file: f, replaceIndex: null }))]);
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const url = await uploadBlob(file, file.name);
+        setForm((f) => ({ ...f, images: [...f.images, url] }));
+      }
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
   }
 
-  function onPickReplace(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onPickReplace(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     const idx = replaceIndexRef.current;
     e.target.value = "";
     replaceIndexRef.current = null;
     if (!file || idx === null) return;
-    setPending((p) => [...p, { file, replaceIndex: idx }]);
+    setUploading(true);
+    try {
+      const url = await uploadBlob(file, file.name);
+      setForm((f) => {
+        const next = [...f.images];
+        if (idx < next.length) next[idx] = url;
+        return { ...f, images: next };
+      });
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function openAdjust(idx: number) {
+    const src = form.images[idx];
+    if (!src) return;
+    try {
+      const res = await fetch(src);
+      const blob = await res.blob();
+      const file = new File([blob], `image-${idx}.jpg`, { type: blob.type || "image/jpeg" });
+      setPending((p) => [...p, { file, replaceIndex: idx }]);
+    } catch {
+      setMsg("Could not load image for adjusting.");
+    }
   }
 
   function triggerReplace(idx: number) {
