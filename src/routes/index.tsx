@@ -96,14 +96,23 @@ function Home() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground">
-              An atelier of handloom sarees drawn from every corner of India — Kanchipuram silks,
-              Banarasi brocades, Paithani peacocks, Sambalpuri ikats. Each drape carries the
-              patience of a loom and the story of the hands that wove it.
+              An atelier of handloom sarees from all 29 states &amp; 9 U.Ts of India such as
+              Sambalpuri ikats, Kanchipuram silks, Banarasi brocades, Paithani peacocks, premium
+              night wears, salwar, lehenga and many more. Each drape, narrates a story of
+              inheritance.
             </p>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm text-primary/80">
-              A small team of women, weaving bonds one thread at a time — carrying the craft of
-              our sisters, mothers and grandmothers to you.
+              We, as SakhiSuta team, support and provide source of income for livelihoods, to the
+              weavers and women of India.
+            </p>
+
+            <p className="mx-auto mt-4 max-w-2xl text-sm text-foreground/80">
+              To be a part of our journey, please{" "}
+              <Link to="/join" className="text-primary underline underline-offset-4 hover:text-primary-glow">
+                connect with us
+              </Link>
+              .
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
