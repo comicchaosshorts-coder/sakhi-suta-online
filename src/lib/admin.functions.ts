@@ -212,3 +212,144 @@ export const getPublicProductImageUrl = createServerFn({ method: "GET" })
       .createSignedUrl(data.key, 60 * 60 * 24 * 365);
     return { url: signed?.signedUrl ?? null };
   });
+
+// ============ HERO SLIDES ============
+export const adminListHeroSlides = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("hero_slides")
+      .select("*")
+      .order("display_order", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const upsertHeroSlide = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        image_url: z.string().min(1).max(1000),
+        caption: z.string().max(200).optional().nullable(),
+        link_url: z.string().max(500).optional().nullable(),
+        display_order: z.number().int().min(0).max(1000),
+        active: z.boolean(),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const payload = {
+      image_url: data.image_url,
+      caption: data.caption ?? null,
+      link_url: data.link_url ?? null,
+      display_order: data.display_order,
+      active: data.active,
+    };
+    if (data.id) {
+      const { error } = await context.supabase
+        .from("hero_slides")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw error;
+      return { ok: true, id: data.id };
+    }
+    const { data: row, error } = await context.supabase
+      .from("hero_slides")
+      .insert(payload)
+      .select("id")
+      .maybeSingle();
+    if (error) throw error;
+    return { ok: true, id: row?.id };
+  });
+
+export const deleteHeroSlide = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("hero_slides").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ============ PARTNER INQUIRIES ============
+export const adminListInquiries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("partner_inquiries")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const updateInquiryStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ id: z.string().uuid(), status: z.string().min(1).max(30) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase
+      .from("partner_inquiries")
+      .update({ status: data.status })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const deleteInquiry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("partner_inquiries").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ============ TESTIMONIALS ============
+export const adminListTestimonials = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("testimonials")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const setTestimonialApproved = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase
+      .from("testimonials")
+      .update({ approved: data.approved })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const deleteTestimonial = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("testimonials").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
