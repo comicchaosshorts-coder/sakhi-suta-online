@@ -68,8 +68,8 @@ export function Coverflow3D({ products }: Props) {
 
   return (
     <div
-      className="relative mx-auto w-full select-none"
-      style={{ perspective: "1400px" }}
+      className="relative mx-auto w-full max-w-full box-border"
+      style={{ perspective: "1400px", overflowX: "clip", overflowY: "visible" }}
       onMouseDown={(e) => onDown(e.clientX)}
       onMouseMove={(e) => startX.current !== null && onMove(e.clientX)}
       onMouseUp={onUp}
@@ -83,9 +83,10 @@ export function Coverflow3D({ products }: Props) {
       onTouchEnd={onUp}
     >
       <div
-        className="relative mx-auto h-[380px] w-full max-w-3xl md:h-[460px]"
-        style={{ transformStyle: "preserve-3d", transform: "rotateX(6deg)" }}
+        className="relative mx-auto h-[380px] w-full max-w-3xl md:h-[440px]"
+        style={{ transformStyle: "preserve-3d", transform: "rotateX(4deg)" }}
       >
+
         {products.map((p, i) => {
           const d = rel(i);
           const absD = Math.abs(d);
