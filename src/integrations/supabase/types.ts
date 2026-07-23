@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      hero_slides: {
+        Row: {
+          active: boolean
+          caption: string | null
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          link_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+          link_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -59,6 +92,51 @@ export type Database = {
           total_inr?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      partner_inquiries: {
+        Row: {
+          address: string
+          budget: string | null
+          created_at: string
+          experience: string
+          id: string
+          interested: boolean
+          locality: string | null
+          name: string
+          phone: string
+          status: string
+          timeline: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          budget?: string | null
+          created_at?: string
+          experience: string
+          id?: string
+          interested?: boolean
+          locality?: string | null
+          name: string
+          phone: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          budget?: string | null
+          created_at?: string
+          experience?: string
+          id?: string
+          interested?: boolean
+          locality?: string | null
+          name?: string
+          phone?: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -258,6 +336,33 @@ export type Database = {
           name?: string
           saree_types?: string[]
           slug?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          approved: boolean
+          created_at: string
+          id: string
+          message: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          message: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          id?: string
+          message?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
