@@ -9,6 +9,7 @@ import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { TestimonialsSection } from "@/components/site/TestimonialsSection";
+import { Coverflow3D } from "@/components/site/Coverflow3D";
 
 const homeQuery = queryOptions({
   queryKey: ["home"],
