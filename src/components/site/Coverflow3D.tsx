@@ -83,16 +83,15 @@ export function Coverflow3D({ products }: Props) {
       onTouchEnd={onUp}
     >
       <div
-        className="relative mx-auto h-[380px] w-full max-w-3xl md:h-[440px]"
+        className="relative mx-auto h-[360px] w-full max-w-3xl md:h-[420px]"
         style={{ transformStyle: "preserve-3d", transform: "rotateX(4deg)" }}
       >
-
         {products.map((p, i) => {
           const d = rel(i);
           const absD = Math.abs(d);
           if (absD > 2) return null;
           const dragOffset = drag * 0.4;
-          const x = d * 130 + dragOffset;
+          const x = d * 120 + dragOffset;
           const rotY = d * -22;
           const z = -Math.abs(d) * 160;
           const scale = d === 0 ? 1 : 0.78 - absD * 0.05;
@@ -104,7 +103,8 @@ export function Coverflow3D({ products }: Props) {
               key={p.id}
               to="/product/$slug"
               params={{ slug: p.slug }}
-              className="absolute left-1/2 top-1/2 block h-[340px] w-[190px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-primary/20 bg-secondary shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] md:h-[420px] md:w-[240px]"
+              className="absolute left-1/2 top-1/2 block h-[300px] w-[170px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-primary/20 bg-secondary shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] md:h-[380px] md:w-[220px]"
+
               style={{
                 transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg) scale(${scale})`,
                 transition: startX.current !== null ? "none" : "transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease",
