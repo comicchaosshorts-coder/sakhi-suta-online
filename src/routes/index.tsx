@@ -9,6 +9,7 @@ import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { TestimonialsSection } from "@/components/site/TestimonialsSection";
+import { Coverflow3D } from "@/components/site/Coverflow3D";
 
 const homeQuery = queryOptions({
   queryKey: ["home"],
@@ -82,6 +83,19 @@ function Home() {
               <HeroCarousel slides={slides} />
             </motion.div>
           )}
+
+          {products.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.12 }}
+              className="mb-12"
+            >
+              <Coverflow3D products={products} />
+            </motion.div>
+          )}
+
+
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}
