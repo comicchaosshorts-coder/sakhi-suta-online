@@ -84,6 +84,19 @@ function Home() {
             </motion.div>
           )}
 
+          {products.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.12 }}
+              className="mb-12"
+            >
+              <Coverflow3D products={products} />
+            </motion.div>
+          )}
+
+
+
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
