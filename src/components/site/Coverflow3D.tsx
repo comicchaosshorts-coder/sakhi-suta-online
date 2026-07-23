@@ -103,7 +103,7 @@ export function Coverflow3D({ products }: Props) {
               key={p.id}
               to="/product/$slug"
               params={{ slug: p.slug }}
-              className="absolute left-1/2 top-1/2 block h-[300px] w-[170px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-primary/20 bg-secondary shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] md:h-[380px] md:w-[220px]"
+              className="absolute left-1/2 top-1/2 block h-[300px] w-[170px] overflow-hidden rounded-2xl border border-primary/20 bg-secondary shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] md:h-[380px] md:w-[220px]"
 
               style={{
                 transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${rotY}deg) scale(${scale})`,
