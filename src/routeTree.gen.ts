@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegionsRouteImport } from './routes/regions'
+import { Route as JoinRouteImport } from './routes/join'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -40,6 +41,11 @@ const SearchRoute = SearchRouteImport.update({
 const RegionsRoute = RegionsRouteImport.update({
   id: '/regions',
   path: '/regions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/join'
     | '/regions'
     | '/search'
     | '/shop'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/join'
     | '/regions'
     | '/search'
     | '/shop'
@@ -213,6 +224,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/cart'
     | '/checkout'
+    | '/join'
     | '/regions'
     | '/search'
     | '/shop'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  JoinRoute: typeof JoinRoute
   RegionsRoute: typeof RegionsRoute
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/regions'
       fullPath: '/regions'
       preLoaderRoute: typeof RegionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  JoinRoute: JoinRoute,
   RegionsRoute: RegionsRoute,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRoute,

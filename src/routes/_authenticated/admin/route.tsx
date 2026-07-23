@@ -14,8 +14,11 @@ function AdminLayout() {
   const nav = [
     { to: "/admin", label: "Dashboard" },
     { to: "/admin/branding", label: "Branding & Map" },
+    { to: "/admin/slides", label: "Slides" },
     { to: "/admin/products", label: "Products" },
     { to: "/admin/orders", label: "Orders" },
+    { to: "/admin/inquiries", label: "Inquiries" },
+    { to: "/admin/testimonials", label: "Testimonials" },
   ] as const;
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
