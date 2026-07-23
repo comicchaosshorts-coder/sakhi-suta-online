@@ -30,12 +30,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
-        <Link to="/" className="group flex items-center">
+        <Link to="/" className="group flex items-center gap-3">
           <img
             src={logoAsset.url}
             alt="Sakhi Suta — Weaving Bonds, Celebrating Women"
             className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
           />
+          <span className="font-serif text-xl tracking-wide text-foreground transition group-hover:text-primary md:text-2xl">
+            Sakhi Suta
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
