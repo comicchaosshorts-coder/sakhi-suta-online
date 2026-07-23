@@ -36,8 +36,9 @@ export function Header() {
             alt="Sakhi Suta — Weaving Bonds, Celebrating Women"
             className="h-12 w-12 rounded-full object-contain md:h-14 md:w-14"
           />
-          <span className="font-serif text-xl tracking-wide text-foreground transition group-hover:text-primary md:text-2xl">
-            Sakhi Suta
+          <span className="font-serif text-xl tracking-wide md:text-2xl">
+            <span className="text-primary">Sakhi</span>
+            <span className="text-foreground"> Suta</span>
           </span>
         </Link>
 
