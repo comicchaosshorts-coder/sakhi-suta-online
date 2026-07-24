@@ -28,12 +28,13 @@ const ALIASES: Record<string, string[]> = {
   odisha: ["orissa"],
   uttarakhand: ["uttaranchal"],
   "jammu-and-kashmir": ["jammu & kashmir", "jk"],
+  ladakh: ["ladakh"],
   "dadra-and-nagar-haveli": ["dadra & nagar haveli"],
   "daman-and-diu": ["daman & diu"],
   "andaman-and-nicobar": ["andaman & nicobar", "andaman and nicobar islands"],
+  lakshadweep: ["lakshadweep"],
   puducherry: ["pondicherry", "pudducherry"],
   delhi: ["nct of delhi", "national capital territory of delhi"],
-  telangana: ["andhra pradesh"], // fallback if SVG lacks Telangana split
 };
 
 const norm = (s: string) => s.toLowerCase().replace(/[_\s&.]+/g, "-").replace(/-+/g, "-").trim();
