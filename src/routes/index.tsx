@@ -117,8 +117,7 @@ function Home() {
             </p>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm text-primary/80">
-              We, as SakhiSuta team, support and provide source of income for livelihoods, to the
-              weavers and women of India.
+              Our goal is to create a buisness chain wholeover the map.
             </p>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm text-foreground/80">
