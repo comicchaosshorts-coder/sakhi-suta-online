@@ -121,11 +121,7 @@ function Home() {
             </p>
 
             <p className="mx-auto mt-4 max-w-2xl text-sm text-foreground/80">
-              To be a part of our journey, please{" "}
-              <Link to="/join" className="text-primary underline underline-offset-4 hover:text-primary-glow">
-                connect with us
-              </Link>
-              .
+              Our goal is to create a buisness chain wholeover the map.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
