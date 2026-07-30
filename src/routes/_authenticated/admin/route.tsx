@@ -15,6 +15,7 @@ function AdminLayout() {
     { to: "/admin", label: "Dashboard" },
     { to: "/admin/branding", label: "Branding & Map" },
     { to: "/admin/slides", label: "Slides" },
+    { to: "/admin/promos", label: "Promos" },
     { to: "/admin/products", label: "Products" },
     { to: "/admin/orders", label: "Orders" },
     { to: "/admin/inquiries", label: "Inquiries" },
