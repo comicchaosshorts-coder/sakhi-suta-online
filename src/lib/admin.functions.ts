@@ -353,3 +353,69 @@ export const deleteTestimonial = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// ============ PROMO CONTENT ============
+export const adminListPromoContent = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("promo_content")
+      .select("*")
+      .order("kind", { ascending: true })
+      .order("display_order", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const upsertPromoContent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        kind: z.enum(["announcement", "marquee", "usp"]),
+        text: z.string().trim().min(1).max(200),
+        subtext: z.string().max(200).optional().nullable(),
+        link_url: z.string().max(500).optional().nullable(),
+        display_order: z.number().int().min(0).max(1000),
+        active: z.boolean(),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const payload = {
+      kind: data.kind,
+      text: data.text,
+      subtext: data.subtext || null,
+      link_url: data.link_url || null,
+      display_order: data.display_order,
+      active: data.active,
+    };
+    if (data.id) {
+      const { error } = await context.supabase
+        .from("promo_content")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw error;
+      return { ok: true, id: data.id };
+    }
+    const { data: row, error } = await context.supabase
+      .from("promo_content")
+      .insert(payload)
+      .select("id")
+      .maybeSingle();
+    if (error) throw error;
+    return { ok: true, id: row?.id };
+  });
+
+export const deletePromoContent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("promo_content").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });

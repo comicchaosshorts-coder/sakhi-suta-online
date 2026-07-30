@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ShoppingBag, Search, User, Menu, X } from "lucide-react";
 import { useCart } from "@/lib/cart-store";
 import { useHydrated } from "@/lib/hooks";
 import { supabase } from "@/integrations/supabase/client";
+import { listPromoContent } from "@/lib/promos.functions";
+import { AnnouncementBar } from "@/components/site/AnnouncementBar";
 import logoAsset from "@/assets/sakhi-suta-logo.png.asset.json";
 
 export function Header() {
@@ -11,6 +14,13 @@ export function Header() {
   const count = useCart((s) => s.items.reduce((n, i) => n + i.quantity, 0));
   const [signedIn, setSignedIn] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const { data: promos = [] } = useQuery({
+    queryKey: ["promo-content"],
+    queryFn: () => listPromoContent(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const announcements = promos.filter((p) => p.kind === "announcement");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSignedIn(Boolean(data.session)));
@@ -24,12 +34,13 @@ export function Header() {
     { to: "/", label: "Home" },
     { to: "/shop", label: "Shop" },
     { to: "/regions", label: "Shop by Region" },
-    { to: "/search", label: "Search" },
+    { to: "/join", label: "Partner with us" },
   ] as const;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-8">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-xl">
+      <AnnouncementBar items={announcements} />
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-8">
         <Link to="/" className="group flex items-center gap-3">
           <img
             src={logoAsset.url}
@@ -47,7 +58,7 @@ export function Header() {
             <Link
               key={n.to}
               to={n.to}
-              className="text-sm text-muted-foreground transition hover:text-primary"
+              className="text-sm font-medium text-foreground/70 transition hover:text-primary"
               activeProps={{ className: "text-primary" }}
             >
               {n.label}
@@ -55,32 +66,36 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Link to="/search" className="hidden rounded-full p-2 text-muted-foreground hover:text-primary md:inline-flex">
+        <div className="flex items-center gap-1">
+          <Link
+            to="/search"
+            className="hidden rounded-full p-2 text-foreground/70 hover:bg-secondary hover:text-primary md:inline-flex"
+            aria-label="Search"
+          >
             <Search className="h-5 w-5" />
           </Link>
           <Link
             to={signedIn ? "/account" : "/auth"}
-            className="rounded-full p-2 text-muted-foreground hover:text-primary"
+            className="rounded-full p-2 text-foreground/70 hover:bg-secondary hover:text-primary"
             aria-label="Account"
           >
             <User className="h-5 w-5" />
           </Link>
           <Link
             to="/cart"
-            className="relative rounded-full p-2 text-muted-foreground hover:text-primary"
+            className="relative rounded-full p-2 text-foreground/70 hover:bg-secondary hover:text-primary"
             aria-label="Cart"
           >
             <ShoppingBag className="h-5 w-5" />
             {hydrated && count > 0 && (
-              <span className="absolute -right-1 -top-1 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                 {count}
               </span>
             )}
           </Link>
           <button
             onClick={() => setOpen((o) => !o)}
-            className="rounded-full p-2 text-muted-foreground hover:text-primary md:hidden"
+            className="rounded-full p-2 text-foreground/70 hover:bg-secondary hover:text-primary md:hidden"
             aria-label="Menu"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -88,14 +103,14 @@ export function Header() {
         </div>
       </div>
       {open && (
-        <div className="border-t border-border/60 bg-background/95 md:hidden">
+        <div className="border-t border-border bg-background md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4">
-            {nav.map((n) => (
+            {[...nav, { to: "/search", label: "Search" } as const].map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 onClick={() => setOpen(false)}
-                className="text-sm text-muted-foreground hover:text-primary"
+                className="text-sm text-foreground/75 hover:text-primary"
                 activeProps={{ className: "text-primary" }}
               >
                 {n.label}

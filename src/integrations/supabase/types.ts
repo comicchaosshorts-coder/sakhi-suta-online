@@ -235,6 +235,42 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_content: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_order: number
+          id: string
+          kind: string
+          link_url: string | null
+          subtext: string | null
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          kind: string
+          link_url?: string | null
+          subtext?: string | null
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          kind?: string
+          link_url?: string | null
+          subtext?: string | null
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           body: string
@@ -279,6 +315,7 @@ export type Database = {
           id: number
           logo_url: string | null
           map_svg_url: string | null
+          promo_banner_url: string | null
           tagline: string
           updated_at: string
         }
@@ -290,6 +327,7 @@ export type Database = {
           id?: number
           logo_url?: string | null
           map_svg_url?: string | null
+          promo_banner_url?: string | null
           tagline?: string
           updated_at?: string
         }
@@ -301,6 +339,7 @@ export type Database = {
           id?: number
           logo_url?: string | null
           map_svg_url?: string | null
+          promo_banner_url?: string | null
           tagline?: string
           updated_at?: string
         }

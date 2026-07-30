@@ -26,6 +26,7 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminSlidesRouteImport } from './routes/_authenticated/admin/slides'
+import { Route as AuthenticatedAdminPromosRouteImport } from './routes/_authenticated/admin/promos'
 import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin/products'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminInquiriesRouteImport } from './routes/_authenticated/admin/inquiries'
@@ -117,6 +118,12 @@ const AuthenticatedAdminSlidesRoute =
     path: '/slides',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminPromosRoute =
+  AuthenticatedAdminPromosRouteImport.update({
+    id: '/promos',
+    path: '/promos',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminProductsRoute =
   AuthenticatedAdminProductsRouteImport.update({
     id: '/products',
@@ -160,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/promos': typeof AuthenticatedAdminPromosRoute
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -181,6 +189,7 @@ export interface FileRoutesByTo {
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/promos': typeof AuthenticatedAdminPromosRoute
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -205,6 +214,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/_authenticated/admin/promos': typeof AuthenticatedAdminPromosRoute
   '/_authenticated/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/admin/inquiries'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/promos'
     | '/admin/slides'
     | '/admin/testimonials'
     | '/admin/'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin/inquiries'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/promos'
     | '/admin/slides'
     | '/admin/testimonials'
     | '/admin'
@@ -273,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/inquiries'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/products'
+    | '/_authenticated/admin/promos'
     | '/_authenticated/admin/slides'
     | '/_authenticated/admin/testimonials'
     | '/_authenticated/admin/'
@@ -413,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSlidesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/promos': {
+      id: '/_authenticated/admin/promos'
+      path: '/promos'
+      fullPath: '/admin/promos'
+      preLoaderRoute: typeof AuthenticatedAdminPromosRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/products': {
       id: '/_authenticated/admin/products'
       path: '/products'
@@ -449,6 +469,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminInquiriesRoute: typeof AuthenticatedAdminInquiriesRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
+  AuthenticatedAdminPromosRoute: typeof AuthenticatedAdminPromosRoute
   AuthenticatedAdminSlidesRoute: typeof AuthenticatedAdminSlidesRoute
   AuthenticatedAdminTestimonialsRoute: typeof AuthenticatedAdminTestimonialsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -460,6 +481,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminInquiriesRoute: AuthenticatedAdminInquiriesRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
+    AuthenticatedAdminPromosRoute: AuthenticatedAdminPromosRoute,
     AuthenticatedAdminSlidesRoute: AuthenticatedAdminSlidesRoute,
     AuthenticatedAdminTestimonialsRoute: AuthenticatedAdminTestimonialsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -501,13 +523,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

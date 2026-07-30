@@ -82,13 +82,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Sakhi Suta is a dark-luxury atelier of Indian handloom sarees, curated from all 29 states — Kanchipuram, Banarasi, Paithani, Sambalpuri, Patola and more.",
+          "Sakhi Suta is a handcrafted Indian ethnic wear house of handloom sarees, curated from all 29 states — Kanchipuram, Banarasi, Paithani, Sambalpuri, Patola and more.",
       },
       { name: "author", content: "Sakhi Suta" },
       { property: "og:title", content: "Sakhi Suta — Elegance Woven in Every Thread" },
       {
         property: "og:description",
-        content: "A dark-luxury atelier of Indian handloom sarees, from every state of India.",
+        content: "Handcrafted Indian ethnic wear and handloom sarees from every state of India.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -106,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
