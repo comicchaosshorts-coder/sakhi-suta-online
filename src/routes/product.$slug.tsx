@@ -76,7 +76,7 @@ function ProductPage() {
     ? activeVariant.compare_at_price_inr ?? null
     : product.compare_at_price_inr;
   const displayDescription = activeVariant?.description || product.description;
-  const img = product.images?.[selected] || product.images?.[0];
+  const img = gallery[selected] || gallery[0];
   const avgRating =
     reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
