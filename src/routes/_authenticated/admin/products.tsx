@@ -24,6 +24,7 @@ type VariantForm = {
   description: string;
   price_inr: number;
   compare_at_price_inr: number;
+  images: string[];
 };
 
 const emptyForm = {
