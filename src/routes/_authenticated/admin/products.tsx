@@ -58,6 +58,44 @@ function Products() {
   const addInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const replaceIndexRef = useRef<number | null>(null);
+  const variantInputRef = useRef<HTMLInputElement>(null);
+  const variantIndexRef = useRef<number | null>(null);
+
+  function triggerVariantPick(idx: number) {
+    variantIndexRef.current = idx;
+    variantInputRef.current?.click();
+  }
+
+  async function onPickVariantFiles(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    const idx = variantIndexRef.current;
+    e.target.value = "";
+    variantIndexRef.current = null;
+    if (files.length === 0 || idx === null) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const url = await uploadBlob(file, file.name);
+        setForm((f) => ({
+          ...f,
+          variants: f.variants.map((x, i) => (i === idx ? { ...x, images: [...x.images, url] } : x)),
+        }));
+      }
+    } catch (err) {
+      setMsg(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeVariantImage(vIdx: number, imgIdx: number) {
+    setForm((f) => ({
+      ...f,
+      variants: f.variants.map((x, i) =>
+        i === vIdx ? { ...x, images: x.images.filter((_, j) => j !== imgIdx) } : x,
+      ),
+    }));
+  }
 
   async function save() {
     try {
