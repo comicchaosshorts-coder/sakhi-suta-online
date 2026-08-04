@@ -540,6 +540,7 @@ function Products() {
                           description: String(v.description ?? ""),
                           price_inr: Number(v.price_inr ?? 0),
                           compare_at_price_inr: Number(v.compare_at_price_inr ?? 0),
+                          images: Array.isArray(v.images) ? (v.images as string[]).map(String) : [],
                         }))
                       : [],
                   })
