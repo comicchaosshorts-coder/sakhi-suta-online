@@ -118,9 +118,9 @@ function ProductPage() {
               {product.name.charAt(0)}
             </div>
           )}
-          {product.images && product.images.length > 1 && (
+          {gallery.length > 1 && (
             <div className="mt-4 flex gap-3 overflow-x-auto">
-              {product.images.map((src, i) => (
+              {gallery.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setSelected(i)}
