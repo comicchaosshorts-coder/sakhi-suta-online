@@ -371,6 +371,7 @@ function Products() {
                         description: "",
                         price_inr: f.price_inr || 0,
                         compare_at_price_inr: f.compare_at_price_inr || 0,
+                        images: [],
                       },
                     ],
                   }))
