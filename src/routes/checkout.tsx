@@ -59,7 +59,7 @@ function Checkout() {
   }, []);
 
   if (!hydrated) return null;
-  const shipping = subtotal >= 5000 ? 0 : 99;
+  const shipping = 0;
   const total = subtotal + shipping;
 
   async function onSubmit(e: React.FormEvent) {

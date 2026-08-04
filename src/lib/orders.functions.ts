@@ -52,7 +52,7 @@ export const createOrder = createServerFn({ method: "POST" })
     });
 
     const subtotal = items.reduce((s, i) => s + i.price_inr * i.quantity, 0);
-    const shipping = subtotal >= 5000 ? 0 : 99;
+    const shipping = 0;
     const total = subtotal + shipping;
 
     const { data: order, error } = await context.supabase

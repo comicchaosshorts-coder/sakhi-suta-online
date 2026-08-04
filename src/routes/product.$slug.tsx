@@ -64,14 +64,19 @@ function ProductPage() {
     description?: string;
     price_inr: number;
     compare_at_price_inr?: number | null;
+    images?: string[] | null;
   }>;
   const activeVariant = variants[variantIdx];
+  const gallery =
+    activeVariant?.images && activeVariant.images.length > 0
+      ? activeVariant.images
+      : product.images ?? [];
   const displayPrice = activeVariant ? activeVariant.price_inr : product.price_inr;
   const displayCompare = activeVariant
     ? activeVariant.compare_at_price_inr ?? null
     : product.compare_at_price_inr;
   const displayDescription = activeVariant?.description || product.description;
-  const img = product.images?.[selected] || product.images?.[0];
+  const img = gallery[selected] || gallery[0];
   const avgRating =
     reviews.length > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
 
@@ -113,9 +118,9 @@ function ProductPage() {
               {product.name.charAt(0)}
             </div>
           )}
-          {product.images && product.images.length > 1 && (
+          {gallery.length > 1 && (
             <div className="mt-4 flex gap-3 overflow-x-auto">
-              {product.images.map((src, i) => (
+              {gallery.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setSelected(i)}
@@ -167,7 +172,10 @@ function ProductPage() {
                 {variants.map((v, i) => (
                   <button
                     key={v.id}
-                    onClick={() => setVariantIdx(i)}
+                    onClick={() => {
+                      setVariantIdx(i);
+                      setSelected(0);
+                    }}
                     className={`rounded-full border px-4 py-2 text-xs transition ${
                       variantIdx === i
                         ? "border-primary bg-primary/10 text-primary"

@@ -16,7 +16,7 @@ function CartPage() {
   const remove = useCart((s) => s.remove);
   const subtotal = useCart((s) => s.items.reduce((n, i) => n + i.price_inr * i.quantity, 0));
   if (!hydrated) return <div className="p-10 text-center text-muted-foreground">Loading…</div>;
-  const shipping = subtotal >= 5000 ? 0 : subtotal === 0 ? 0 : 99;
+  const shipping = 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 md:px-8">
