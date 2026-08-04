@@ -172,7 +172,10 @@ function ProductPage() {
                 {variants.map((v, i) => (
                   <button
                     key={v.id}
-                    onClick={() => setVariantIdx(i)}
+                    onClick={() => {
+                      setVariantIdx(i);
+                      setSelected(0);
+                    }}
                     className={`rounded-full border px-4 py-2 text-xs transition ${
                       variantIdx === i
                         ? "border-primary bg-primary/10 text-primary"
