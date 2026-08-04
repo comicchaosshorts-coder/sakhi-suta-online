@@ -1,8 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useBlocker } from "@tanstack/react-router";
+import { useState } from "react";
 import { useCart, cartKey } from "@/lib/cart-store";
 import { formatINR } from "@/lib/format";
 import { useHydrated } from "@/lib/hooks";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({ meta: [{ title: "Cart — Sakhi Suta" }] }),
@@ -15,6 +26,14 @@ function CartPage() {
   const setQty = useCart((s) => s.setQty);
   const remove = useCart((s) => s.remove);
   const subtotal = useCart((s) => s.items.reduce((n, i) => n + i.price_inr * i.quantity, 0));
+  const [pendingKey, setPendingKey] = useState<string | null>(null);
+
+  const blocker = useBlocker({
+    shouldBlockFn: () => items.length > 0,
+    enableBeforeUnload: true,
+    withResolver: true,
+  });
+
   if (!hydrated) return <div className="p-10 text-center text-muted-foreground">Loading…</div>;
   const shipping = 0;
 
@@ -61,7 +80,11 @@ function CartPage() {
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
-                    <button onClick={() => remove(k)} className="text-muted-foreground hover:text-destructive">
+                    <button
+                      onClick={() => setPendingKey(k)}
+                      className="text-muted-foreground hover:text-destructive"
+                      aria-label="Remove item"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -88,6 +111,40 @@ function CartPage() {
           </div>
         </div>
       )}
+
+      <AlertDialog open={pendingKey !== null} onOpenChange={(open) => !open && setPendingKey(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove item?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to exit this item from your cart?</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingKey(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingKey) remove(pendingKey);
+                setPendingKey(null);
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={blocker.status === "blocked"} onOpenChange={() => blocker.reset?.()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave cart?</AlertDialogTitle>
+            <AlertDialogDescription>Are you sure you want to exit? Your cart items will be saved.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => blocker.reset?.()}>Stay</AlertDialogCancel>
+            <AlertDialogAction onClick={() => blocker.proceed?.()}>Exit</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
