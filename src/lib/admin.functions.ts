@@ -95,6 +95,7 @@ const VariantInput = z.object({
   description: z.string().max(2000).default(""),
   price_inr: z.number().int().min(0),
   compare_at_price_inr: z.number().int().min(0).nullable().optional(),
+  images: z.array(z.string().max(500)).max(20).default([]),
 });
 
 const ProductInput = z.object({
