@@ -109,7 +109,7 @@ function Home() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-base text-muted-foreground">
-              An atelier of handloom sarees from all 29 states &amp; 9 U.Ts of India such as
+              An atelier of handloom sarees from all twenty nine states and nine Union Territories of India such as
               Sambalpuri ikats, Kanchipuram silks, Banarasi brocades, Paithani peacocks, premium
               night wears, salwar, lehenga and many more. Each drape, narrates a story of
               inheritance.
