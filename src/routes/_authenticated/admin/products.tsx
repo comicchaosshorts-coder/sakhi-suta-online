@@ -501,10 +501,49 @@ function Products() {
                       className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
                     />
                   </label>
+                  <div className="block">
+                    <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
+                      Variant images ({v.images.length})
+                    </span>
+                    {v.images.length > 0 && (
+                      <div className="mb-2 grid grid-cols-3 gap-2">
+                        {v.images.map((src, j) => (
+                          <div key={j} className="group relative overflow-hidden rounded-md bg-secondary">
+                            <img src={src} alt="" className="block h-auto w-full object-contain" />
+                            <button
+                              type="button"
+                              onClick={() => removeVariantImage(idx, j)}
+                              className="absolute right-1 top-1 rounded bg-black/70 px-1.5 text-[11px] text-white opacity-0 transition group-hover:opacity-100"
+                              title="Remove"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => triggerVariantPick(idx)}
+                      disabled={uploading}
+                      className="flex w-full items-center justify-center rounded-md border border-dashed border-border/60 bg-input/20 px-3 py-3 text-xs text-muted-foreground hover:border-primary hover:text-primary disabled:opacity-60"
+                    >
+                      {uploading ? "Uploading…" : "Add images for this variant"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
+            <input
+              ref={variantInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={onPickVariantFiles}
+              className="hidden"
+            />
           </div>
+
 
           <label className="flex items-center gap-2 text-sm">
             <input
