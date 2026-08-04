@@ -64,8 +64,13 @@ function ProductPage() {
     description?: string;
     price_inr: number;
     compare_at_price_inr?: number | null;
+    images?: string[] | null;
   }>;
   const activeVariant = variants[variantIdx];
+  const gallery =
+    activeVariant?.images && activeVariant.images.length > 0
+      ? activeVariant.images
+      : product.images ?? [];
   const displayPrice = activeVariant ? activeVariant.price_inr : product.price_inr;
   const displayCompare = activeVariant
     ? activeVariant.compare_at_price_inr ?? null
