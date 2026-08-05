@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMarkSeen } from "@/lib/admin-badges";
+
 import {
   adminListInquiries,
   deleteInquiry,
