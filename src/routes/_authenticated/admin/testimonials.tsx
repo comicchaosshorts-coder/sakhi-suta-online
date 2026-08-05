@@ -5,6 +5,8 @@ import {
   deleteTestimonial,
   setTestimonialApproved,
 } from "@/lib/admin.functions";
+import { useMarkSeen } from "@/lib/admin-badges";
+
 
 export const Route = createFileRoute("/_authenticated/admin/testimonials")({
   component: TestimonialsAdmin,
