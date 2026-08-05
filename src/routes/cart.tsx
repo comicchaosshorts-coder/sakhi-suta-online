@@ -29,10 +29,11 @@ function CartPage() {
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 
   const blocker = useBlocker({
-    shouldBlockFn: () => items.length > 0,
-    enableBeforeUnload: true,
+    shouldBlockFn: ({ next }) => items.length > 0 && next.pathname !== "/checkout",
+    enableBeforeUnload: false,
     withResolver: true,
   });
+
 
   if (!hydrated) return <div className="p-10 text-center text-muted-foreground">Loading…</div>;
   const shipping = 0;

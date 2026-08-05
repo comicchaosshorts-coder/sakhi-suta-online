@@ -5,6 +5,8 @@ import {
   deleteTestimonial,
   setTestimonialApproved,
 } from "@/lib/admin.functions";
+import { useMarkSeen } from "@/lib/admin-badges";
+
 
 export const Route = createFileRoute("/_authenticated/admin/testimonials")({
   component: TestimonialsAdmin,
@@ -19,7 +21,9 @@ type T = {
 };
 
 function TestimonialsAdmin() {
+  useMarkSeen("testimonials");
   const qc = useQueryClient();
+
   const { data: rows = [] } = useQuery<T[]>({
     queryKey: ["admin-testimonials"],
     queryFn: () => adminListTestimonials(),
