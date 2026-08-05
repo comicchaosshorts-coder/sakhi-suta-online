@@ -25,7 +25,9 @@ type Inquiry = {
 };
 
 function InquiriesAdmin() {
+  useMarkSeen("inquiries");
   const qc = useQueryClient();
+
   const { data: rows = [] } = useQuery<Inquiry[]>({
     queryKey: ["admin-inquiries"],
     queryFn: () => adminListInquiries(),
