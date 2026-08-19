@@ -88,7 +88,7 @@ function Checkout() {
       if (!res.razorpay) {
         // No Razorpay keys yet — mock success
         clear();
-        navigate({ to: "/account/orders" });
+        navigate({ to: "/account" });
         return;
       }
       if (!window.Razorpay) {
@@ -120,7 +120,7 @@ function Checkout() {
               },
             });
             clear();
-            navigate({ to: "/account/orders" });
+            navigate({ to: "/account" });
           } catch (err) {
             setError(err instanceof Error ? err.message : "Payment verification failed");
           }
