@@ -26,7 +26,7 @@ export function TestimonialsSection({ items }: { items: T[] }) {
     <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
       <div className="mb-10 text-center">
         <p className="text-xs uppercase tracking-[0.4em] text-primary/70">Whispers from the drape</p>
-        <h2 className="mt-2 font-serif text-4xl md:text-5xl">What our sisters say</h2>
+        <h2 className="mt-2 font-serif text-4xl md:text-5xl">What our customers say</h2>
       </div>
 
       {items.length > 0 && (
