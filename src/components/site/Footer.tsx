@@ -49,7 +49,7 @@ export function Footer() {
             Account
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/auth" className="hover:text-primary">Sign in</Link></li>
+            <li><Link to="/auth" search={{ next: "/account" }} className="hover:text-primary">Sign in</Link></li>
             <li><Link to="/account" className="hover:text-primary">My orders</Link></li>
             <li><Link to="/cart" className="hover:text-primary">Cart</Link></li>
           </ul>
