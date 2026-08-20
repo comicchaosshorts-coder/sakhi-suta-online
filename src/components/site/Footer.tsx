@@ -2,6 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { Instagram, Mail, Phone } from "lucide-react";
 import logoAsset from "@/assets/sakhi-suta-logo.png.asset.json";
 
+const phone = "+91 63706 00422";
+const email = "sakhisutaofficialpi@gmail.com";
+const instagram = "https://www.instagram.com/sakhisutaofficial?igsh=NmFzMzQzZjZ1M3Js";
+
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-border bg-secondary/60">
@@ -21,16 +25,48 @@ export function Footer() {
             Handcrafted Indian ethnic wear, curated from every state of India — woven by master
             artisans, worn by heirs. Weaving bonds, celebrating women.
           </p>
-          <div className="mt-5 flex gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary">
-              <Instagram className="h-4 w-4" />
-            </span>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary">
-              <Mail className="h-4 w-4" />
-            </span>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary">
-              <Phone className="h-4 w-4" />
-            </span>
+          <div className="mt-5 flex flex-col gap-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <a
+                href={instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-foreground"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a
+                href={`mailto:${email}`}
+                className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-foreground"
+                aria-label="Email"
+              >
+                <Mail className="h-4 w-4" />
+              </a>
+              <a
+                href={`tel:${phone.replace(/\s/g, "")}`}
+                className="grid h-9 w-9 place-items-center rounded-full bg-primary/10 text-primary transition hover:bg-primary hover:text-primary-foreground"
+                aria-label="Phone"
+              >
+                <Phone className="h-4 w-4" />
+              </a>
+            </div>
+            <div className="flex flex-col gap-1 pt-1">
+              <a
+                href={`tel:${phone.replace(/\s/g, "")}`}
+                className="flex items-center gap-2 hover:text-primary"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                {phone}
+              </a>
+              <a
+                href={`mailto:${email}`}
+                className="flex items-center gap-2 hover:text-primary"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                {email}
+              </a>
+            </div>
           </div>
         </div>
         <div>
@@ -61,3 +97,4 @@ export function Footer() {
     </footer>
   );
 }
+
