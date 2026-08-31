@@ -26,7 +26,7 @@ async function audit(
     action,
     entity,
     entity_id: entityId,
-    details,
+    details: details as never,
   });
 }
 
@@ -350,7 +350,7 @@ export const discountAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const paid = ["paid", "shipped", "delivered"];
+    const paid = ["paid", "shipped", "delivered"] as const;
     const [orders, redemptions, campaigns] = await Promise.all([
       context.supabase
         .from("orders")
