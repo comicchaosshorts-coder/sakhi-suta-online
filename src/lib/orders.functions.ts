@@ -147,6 +147,22 @@ export const verifyPayment = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
     if (!keySecret) throw new Error("Payment gateway not configured");
+
+    // Bind the signature to THIS order: a valid signature for a different
+    // (cheaper) Razorpay order must never be able to settle another order.
+    const { data: target, error: fErr } = await context.supabase
+      .from("orders")
+      .select("id,status,razorpay_order_id")
+      .eq("id", data.orderId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (fErr) throw fErr;
+    if (!target) throw new Error("Order not found");
+    if (target.status !== "pending") throw new Error("This order is no longer awaiting payment");
+    if (!target.razorpay_order_id || target.razorpay_order_id !== data.razorpay_order_id) {
+      throw new Error("Payment does not match this order");
+    }
+
     const crypto = await import("crypto");
     const expected = crypto
       .createHmac("sha256", keySecret)
@@ -164,6 +180,7 @@ export const verifyPayment = createServerFn({ method: "POST" })
       .eq("id", data.orderId)
       .eq("user_id", context.userId);
     if (error) throw error;
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.rpc("settle_coupon_redemption", {
