@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import type { Quote } from "./pricing-types";
 
@@ -16,19 +15,6 @@ export const QuoteInputSchema = z.object({
   couponCode: z.string().max(40).nullish(),
 });
 
-/** Optional-auth caller identity, derived from the verified bearer token only. */
-export async function resolveCaller() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const header = getRequestHeader("authorization") ?? "";
-  const token = header.replace(/^Bearer\s+/i, "").trim();
-  let userId: string | null = null;
-  if (token) {
-    const { data } = await supabaseAdmin.auth.getUser(token);
-    userId = data.user?.id ?? null;
-  }
-  return { supabaseAdmin, userId };
-}
-
 /**
  * Authoritative cart quote. The browser sends product ids, variant ids and
  * quantities only — every price, discount and total is computed here.
@@ -38,6 +24,7 @@ export const quoteCart = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<Quote> => {
     const { buildQuote } = await import("./pricing.server");
     const { createPublicClient } = await import("./supabase-public.server");
+    const { resolveCaller } = await import("./caller.server");
     const { supabaseAdmin, userId } = await resolveCaller();
     return buildQuote(
       { db: createPublicClient(), admin: supabaseAdmin, userId },
