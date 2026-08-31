@@ -18,6 +18,8 @@ export function cartKey(i: { productId: string; variantId?: string | null }) {
 
 type CartState = {
   items: CartItem[];
+  couponCode: string | null;
+  setCoupon: (code: string | null) => void;
   add: (item: Omit<CartItem, "quantity">, qty?: number) => void;
   remove: (key: string) => void;
   setQty: (key: string, qty: number) => void;
@@ -30,6 +32,8 @@ export const useCart = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      couponCode: null,
+      setCoupon: (code) => set({ couponCode: code ? code.trim().toUpperCase() : null }),
       add: (item, qty = 1) =>
         set((s) => {
           const k = cartKey(item);
@@ -50,7 +54,7 @@ export const useCart = create<CartState>()(
             .map((i) => (cartKey(i) === key ? { ...i, quantity: Math.max(1, qty) } : i))
             .filter((i) => i.quantity > 0),
         })),
-      clear: () => set({ items: [] }),
+      clear: () => set({ items: [], couponCode: null }),
       count: () => get().items.reduce((n, i) => n + i.quantity, 0),
       subtotal: () => get().items.reduce((n, i) => n + i.quantity * i.price_inr, 0),
     }),

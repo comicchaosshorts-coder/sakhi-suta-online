@@ -97,12 +97,8 @@ function CartPage() {
           </div>
           <div className="h-fit rounded-xl glass p-6">
             <h2 className="font-serif text-2xl">Summary</h2>
-            <div className="mt-4 space-y-2 text-sm">
-              <Row label="Subtotal" value={formatINR(subtotal)} />
-              <Row label="Shipping" value={shipping === 0 ? "Free" : formatINR(shipping)} />
-              <div className="my-3 h-px bg-border/60" />
-              <Row label="Total" value={formatINR(subtotal + shipping)} bold />
-            </div>
+            <PriceSummary quote={quote.data} fallbackSubtotal={subtotal} loading={quote.isFetching} />
+            <CouponBox quote={quote.data} />
             <Link
               to="/checkout"
               className="mt-6 block rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground hover:bg-primary-glow"
@@ -110,6 +106,7 @@ function CartPage() {
               Proceed to checkout
             </Link>
           </div>
+
         </div>
       )}
 

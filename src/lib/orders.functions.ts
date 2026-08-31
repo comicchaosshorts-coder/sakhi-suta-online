@@ -12,13 +12,15 @@ const AddressSchema = z.object({
   pincode: z.string().min(4).max(10),
 });
 
-const CartItemSchema = z.object({
-  productId: z.string().uuid(),
-  name: z.string().min(1).max(200),
-  price_inr: z.number().int().min(0),
-  quantity: z.number().int().min(1).max(20),
-  image: z.string().max(500).optional(),
-});
+// Only identifiers and quantities are accepted from the browser. Prices,
+// discounts and totals are recomputed server-side by the pricing engine.
+const CartItemSchema = z
+  .object({
+    productId: z.string().uuid(),
+    variantId: z.string().max(100).nullish(),
+    quantity: z.number().int().min(1).max(20),
+  })
+  .passthrough();
 
 export const createOrder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -27,42 +29,54 @@ export const createOrder = createServerFn({ method: "POST" })
       .object({
         items: z.array(CartItemSchema).min(1),
         address: AddressSchema,
+        couponCode: z.string().max(40).nullish(),
       })
       .parse(i),
   )
   .handler(async ({ data, context }) => {
-    // Recompute totals from DB — never trust client prices
-    const ids = data.items.map((i) => i.productId);
-    const { data: dbProducts, error: pErr } = await context.supabase
-      .from("products")
-      .select("id,name,price_inr,images,in_stock")
-      .in("id", ids);
-    if (pErr) throw pErr;
+    const { buildQuote } = await import("./pricing.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const items = data.items.map((ci) => {
-      const p = dbProducts?.find((x) => x.id === ci.productId);
-      if (!p || !p.in_stock) throw new Error(`Product unavailable: ${ci.name}`);
-      return {
-        productId: p.id,
-        name: p.name,
-        price_inr: p.price_inr,
-        quantity: ci.quantity,
-        image: p.images?.[0] ?? null,
-      };
-    });
+    const quote = await buildQuote(
+      { db: context.supabase, admin: supabaseAdmin, userId: context.userId },
+      {
+        items: data.items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId ?? null,
+          quantity: i.quantity,
+        })),
+        couponCode: data.couponCode ?? null,
+      },
+    );
 
-    const subtotal = items.reduce((s, i) => s + i.price_inr * i.quantity, 0);
-    const shipping = 0;
-    const total = subtotal + shipping;
+    if (quote.lines.length === 0) throw new Error("No purchasable items in your cart.");
+    if (quote.coupon && !quote.coupon.applied && data.couponCode) {
+      throw new Error(quote.coupon.message);
+    }
+
+    const items = quote.lines.map((l) => ({
+      productId: l.productId,
+      variantId: l.variantId,
+      variantName: l.variantName,
+      name: l.name,
+      price_inr: l.price_inr,
+      quantity: l.quantity,
+      image: l.image,
+    }));
+    const couponDiscount = quote.discounts.find((d) => d.kind === "coupon") ?? null;
 
     const { data: order, error } = await context.supabase
       .from("orders")
       .insert({
         user_id: context.userId,
         items,
-        subtotal_inr: subtotal,
-        shipping_inr: shipping,
-        total_inr: total,
+        subtotal_inr: quote.subtotal_inr,
+        shipping_inr: quote.shipping_inr,
+        discount_inr: quote.discount_total_inr,
+        // Permanent historical snapshot — never recalculated later.
+        discount_breakdown: quote.discounts,
+        coupon_code: couponDiscount?.code ?? null,
+        total_inr: quote.total_inr,
         shipping_address: data.address,
         status: "pending",
       })
@@ -70,7 +84,23 @@ export const createOrder = createServerFn({ method: "POST" })
       .single();
     if (error) throw error;
 
-    // Create Razorpay order if keys configured; otherwise return order for mock flow
+    // Atomically reserve the coupon redemption (race-safe, honours limits).
+    if (couponDiscount?.coupon_id) {
+      const { error: rErr } = await supabaseAdmin.rpc("reserve_coupon", {
+        _coupon_id: couponDiscount.coupon_id,
+        _user_id: context.userId,
+        _order_id: order.id,
+        _discount_inr: couponDiscount.amount_inr,
+      });
+      if (rErr) {
+        await supabaseAdmin.from("orders").delete().eq("id", order.id);
+        const { couponErrorMessage } = await import("./pricing.server");
+        const code = (rErr.message.match(/COUPON_[A-Z_]+/) ?? [])[0] ?? "";
+        throw new Error(couponErrorMessage(code));
+      }
+    }
+
+    const total = quote.total_inr;
     const keyId = process.env.RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
     if (keyId && keySecret) {
@@ -96,10 +126,10 @@ export const createOrder = createServerFn({ method: "POST" })
         .from("orders")
         .update({ razorpay_order_id: rz.id })
         .eq("id", order.id);
-      return { order, razorpay: { orderId: rz.id, keyId, amount: total * 100 } };
+      return { order, quote, razorpay: { orderId: rz.id, keyId, amount: total * 100 } };
     }
 
-    return { order, razorpay: null };
+    return { order, quote, razorpay: null };
   });
 
 export const verifyPayment = createServerFn({ method: "POST" })
@@ -134,6 +164,41 @@ export const verifyPayment = createServerFn({ method: "POST" })
       .eq("id", data.orderId)
       .eq("user_id", context.userId);
     if (error) throw error;
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("settle_coupon_redemption", {
+      _order_id: data.orderId,
+      _status: "consumed",
+    });
+    return { ok: true };
+  });
+
+/** Payment abandoned/failed — frees the reserved coupon use for other shoppers. */
+export const abandonOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ orderId: z.string().uuid(), reason: z.enum(["failed", "cancelled"]) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: order } = await context.supabase
+      .from("orders")
+      .select("id,status")
+      .eq("id", data.orderId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!order || order.status !== "pending") return { ok: false };
+
+    await context.supabase
+      .from("orders")
+      .update({ status: data.reason })
+      .eq("id", data.orderId)
+      .eq("user_id", context.userId);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.rpc("settle_coupon_redemption", {
+      _order_id: data.orderId,
+      _status: "released",
+    });
     return { ok: true };
   });
 
@@ -142,7 +207,9 @@ export const listMyOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("orders")
-      .select("id,items,total_inr,status,created_at")
+      .select(
+        "id,items,subtotal_inr,discount_inr,discount_breakdown,coupon_code,total_inr,status,created_at",
+      )
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
