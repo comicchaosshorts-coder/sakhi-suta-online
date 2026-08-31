@@ -2,6 +2,9 @@ import { createFileRoute, Link, useBlocker } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCart, cartKey } from "@/lib/cart-store";
 import { formatINR } from "@/lib/format";
+import { useQuote } from "@/lib/use-quote";
+import { PriceSummary } from "@/components/site/PriceSummary";
+import { CouponBox } from "@/components/site/CouponBox";
 import { useHydrated } from "@/lib/hooks";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import {
@@ -27,6 +30,7 @@ function CartPage() {
   const remove = useCart((s) => s.remove);
   const subtotal = useCart((s) => s.items.reduce((n, i) => n + i.price_inr * i.quantity, 0));
   const [pendingKey, setPendingKey] = useState<string | null>(null);
+  const quote = useQuote();
 
   const blocker = useBlocker({
     shouldBlockFn: ({ next }) => items.length > 0 && next.pathname !== "/checkout",
@@ -36,7 +40,6 @@ function CartPage() {
 
 
   if (!hydrated) return <div className="p-10 text-center text-muted-foreground">Loading…</div>;
-  const shipping = 0;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 md:px-8">
@@ -97,12 +100,8 @@ function CartPage() {
           </div>
           <div className="h-fit rounded-xl glass p-6">
             <h2 className="font-serif text-2xl">Summary</h2>
-            <div className="mt-4 space-y-2 text-sm">
-              <Row label="Subtotal" value={formatINR(subtotal)} />
-              <Row label="Shipping" value={shipping === 0 ? "Free" : formatINR(shipping)} />
-              <div className="my-3 h-px bg-border/60" />
-              <Row label="Total" value={formatINR(subtotal + shipping)} bold />
-            </div>
+            <PriceSummary quote={quote.data} fallbackSubtotal={subtotal} loading={quote.isFetching} />
+            <CouponBox quote={quote.data} />
             <Link
               to="/checkout"
               className="mt-6 block rounded-full bg-primary px-6 py-3 text-center text-sm font-medium text-primary-foreground hover:bg-primary-glow"
@@ -110,6 +109,7 @@ function CartPage() {
               Proceed to checkout
             </Link>
           </div>
+
         </div>
       )}
 
@@ -146,15 +146,6 @@ function CartPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
-}
-
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
-  return (
-    <div className={`flex justify-between ${bold ? "text-base font-semibold text-foreground" : "text-muted-foreground"}`}>
-      <span>{label}</span>
-      <span>{value}</span>
     </div>
   );
 }

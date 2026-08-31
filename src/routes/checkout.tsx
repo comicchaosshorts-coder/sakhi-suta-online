@@ -4,7 +4,10 @@ import { z } from "zod";
 import { useCart } from "@/lib/cart-store";
 import { useHydrated } from "@/lib/hooks";
 import { formatINR } from "@/lib/format";
-import { createOrder, verifyPayment } from "@/lib/orders.functions";
+import { createOrder, verifyPayment, abandonOrder } from "@/lib/orders.functions";
+import { useQuote } from "@/lib/use-quote";
+import { PriceSummary } from "@/components/site/PriceSummary";
+import { CouponBox } from "@/components/site/CouponBox";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/checkout")({
@@ -33,9 +36,11 @@ function Checkout() {
   const navigate = useNavigate();
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
+  const couponCode = useCart((s) => s.couponCode);
   const subtotal = useCart((s) => s.items.reduce((n, i) => n + i.price_inr * i.quantity, 0));
   const [signedIn, setSignedIn] = useState(false);
   const [busy, setBusy] = useState(false);
+  const quote = useQuote();
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
@@ -59,8 +64,6 @@ function Checkout() {
   }, []);
 
   if (!hydrated) return null;
-  const shipping = 0;
-  const total = subtotal + shipping;
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,12 +82,12 @@ function Checkout() {
     try {
       const cartItems = items.map((i) => ({
         productId: i.productId,
-        name: i.name,
-        price_inr: i.price_inr,
+        variantId: i.variantId ?? null,
         quantity: i.quantity,
-        image: i.image,
       }));
-      const res = await createOrder({ data: { items: cartItems, address: parsed.data } });
+      const res = await createOrder({
+        data: { items: cartItems, address: parsed.data, couponCode },
+      });
       if (!res.razorpay) {
         // No Razorpay keys yet — mock success
         clear();
@@ -104,6 +107,12 @@ function Checkout() {
         description: "Handloom saree order",
         order_id: res.razorpay.orderId,
         prefill: { name: form.full_name, contact: form.phone },
+        modal: {
+          ondismiss: () => {
+            abandonOrder({ data: { orderId: res.order.id, reason: "cancelled" } }).catch(() => {});
+            setBusy(false);
+          },
+        },
         theme: { color: "#D4AF37" },
         handler: async (r: {
           razorpay_order_id: string;
@@ -176,27 +185,18 @@ function Checkout() {
             <h2 className="font-serif text-2xl">Order</h2>
             <div className="mt-4 space-y-2 text-sm">
               {items.map((i) => (
-                <div key={i.productId} className="flex justify-between text-muted-foreground">
+                <div key={`${i.productId}-${i.variantId ?? ""}`} className="flex justify-between text-muted-foreground">
                   <span className="truncate pr-2">
-                    {i.name} × {i.quantity}
+                    {i.name}
+                    {i.variantName ? ` (${i.variantName})` : ""} × {i.quantity}
                   </span>
                   <span>{formatINR(i.price_inr * i.quantity)}</span>
                 </div>
               ))}
               <div className="my-3 h-px bg-border/60" />
-              <div className="flex justify-between text-muted-foreground">
-                <span>Subtotal</span>
-                <span>{formatINR(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-muted-foreground">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : formatINR(shipping)}</span>
-              </div>
-              <div className="mt-2 flex justify-between text-base font-semibold">
-                <span>Total</span>
-                <span>{formatINR(total)}</span>
-              </div>
             </div>
+            <PriceSummary quote={quote.data} fallbackSubtotal={subtotal} loading={quote.isFetching} />
+            <CouponBox quote={quote.data} />
             <button
               disabled={busy}
               className="mt-6 w-full rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)] transition hover:bg-primary-glow disabled:opacity-60"

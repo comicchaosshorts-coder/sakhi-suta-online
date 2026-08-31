@@ -18,7 +18,9 @@ function AdminLayout() {
     { to: "/admin/branding", label: "Branding & Map" },
     { to: "/admin/slides", label: "Slides" },
     { to: "/admin/promos", label: "Promos" },
+    { to: "/admin/discounts", label: "Discounts" },
     { to: "/admin/products", label: "Products" },
+
     { to: "/admin/orders", label: "Orders" },
     { to: "/admin/inquiries", label: "Inquiries", dot: badges.inquiries },
     { to: "/admin/testimonials", label: "Testimonials", dot: badges.testimonials },

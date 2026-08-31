@@ -14,6 +14,329 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity: string
+          entity_id: string | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity: string
+          entity_id?: string | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity?: string
+          entity_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      coupon_redemptions: {
+        Row: {
+          coupon_code: string
+          coupon_id: string
+          created_at: string
+          discount_inr: number
+          id: string
+          order_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          coupon_code: string
+          coupon_id: string
+          created_at?: string
+          discount_inr?: number
+          id?: string
+          order_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          coupon_code?: string
+          coupon_id?: string
+          created_at?: string
+          discount_inr?: number
+          id?: string
+          order_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_redemptions_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          archived: boolean
+          audience: string
+          campaign_id: string | null
+          code: string
+          combine_with_auto: boolean
+          combine_with_campaign: boolean
+          combine_with_returning: boolean
+          created_at: string
+          created_by: string | null
+          description: string
+          end_at: string | null
+          fixed_inr: number
+          id: string
+          max_cart_inr: number | null
+          max_discount_inr: number | null
+          min_cart_inr: number
+          name: string
+          per_customer_limit: number
+          percent: number
+          priority: number
+          product_ids: string[]
+          saree_types: string[]
+          start_at: string | null
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          archived?: boolean
+          audience?: string
+          campaign_id?: string | null
+          code: string
+          combine_with_auto?: boolean
+          combine_with_campaign?: boolean
+          combine_with_returning?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          end_at?: string | null
+          fixed_inr?: number
+          id?: string
+          max_cart_inr?: number | null
+          max_discount_inr?: number | null
+          min_cart_inr?: number
+          name?: string
+          per_customer_limit?: number
+          percent?: number
+          priority?: number
+          product_ids?: string[]
+          saree_types?: string[]
+          start_at?: string | null
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          archived?: boolean
+          audience?: string
+          campaign_id?: string | null
+          code?: string
+          combine_with_auto?: boolean
+          combine_with_campaign?: boolean
+          combine_with_returning?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          end_at?: string | null
+          fixed_inr?: number
+          id?: string
+          max_cart_inr?: number | null
+          max_discount_inr?: number | null
+          min_cart_inr?: number
+          name?: string
+          per_customer_limit?: number
+          percent?: number
+          priority?: number
+          product_ids?: string[]
+          saree_types?: string[]
+          start_at?: string | null
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "discount_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_campaigns: {
+        Row: {
+          active: boolean
+          audience: string
+          created_at: string
+          description: string
+          end_at: string | null
+          fixed_inr: number
+          id: string
+          max_discount_inr: number | null
+          min_subtotal_inr: number
+          name: string
+          overrides_other_discounts: boolean
+          percent: number
+          priority: number
+          product_ids: string[]
+          saree_types: string[]
+          stackable: boolean
+          start_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          audience?: string
+          created_at?: string
+          description?: string
+          end_at?: string | null
+          fixed_inr?: number
+          id?: string
+          max_discount_inr?: number | null
+          min_subtotal_inr?: number
+          name: string
+          overrides_other_discounts?: boolean
+          percent?: number
+          priority?: number
+          product_ids?: string[]
+          saree_types?: string[]
+          stackable?: boolean
+          start_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          audience?: string
+          created_at?: string
+          description?: string
+          end_at?: string | null
+          fixed_inr?: number
+          id?: string
+          max_discount_inr?: number | null
+          min_subtotal_inr?: number
+          name?: string
+          overrides_other_discounts?: boolean
+          percent?: number
+          priority?: number
+          product_ids?: string[]
+          saree_types?: string[]
+          stackable?: boolean
+          start_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      discount_settings: {
+        Row: {
+          auto_enabled: boolean
+          auto_end_at: string | null
+          auto_max_discount_inr: number | null
+          auto_min_subtotal_inr: number
+          auto_percent: number
+          auto_product_ids: string[]
+          auto_saree_types: string[]
+          auto_start_at: string | null
+          id: number
+          returning_enabled: boolean
+          returning_end_at: string | null
+          returning_max_discount_inr: number | null
+          returning_min_orders: number
+          returning_min_subtotal_inr: number
+          returning_percent: number
+          returning_product_ids: string[]
+          returning_saree_types: string[]
+          returning_start_at: string | null
+          stack_auto_with_campaign: boolean
+          stack_auto_with_coupon: boolean
+          stack_auto_with_returning: boolean
+          stack_campaign_with_coupon: boolean
+          stack_returning_with_campaign: boolean
+          stack_returning_with_coupon: boolean
+          updated_at: string
+        }
+        Insert: {
+          auto_enabled?: boolean
+          auto_end_at?: string | null
+          auto_max_discount_inr?: number | null
+          auto_min_subtotal_inr?: number
+          auto_percent?: number
+          auto_product_ids?: string[]
+          auto_saree_types?: string[]
+          auto_start_at?: string | null
+          id?: number
+          returning_enabled?: boolean
+          returning_end_at?: string | null
+          returning_max_discount_inr?: number | null
+          returning_min_orders?: number
+          returning_min_subtotal_inr?: number
+          returning_percent?: number
+          returning_product_ids?: string[]
+          returning_saree_types?: string[]
+          returning_start_at?: string | null
+          stack_auto_with_campaign?: boolean
+          stack_auto_with_coupon?: boolean
+          stack_auto_with_returning?: boolean
+          stack_campaign_with_coupon?: boolean
+          stack_returning_with_campaign?: boolean
+          stack_returning_with_coupon?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auto_enabled?: boolean
+          auto_end_at?: string | null
+          auto_max_discount_inr?: number | null
+          auto_min_subtotal_inr?: number
+          auto_percent?: number
+          auto_product_ids?: string[]
+          auto_saree_types?: string[]
+          auto_start_at?: string | null
+          id?: number
+          returning_enabled?: boolean
+          returning_end_at?: string | null
+          returning_max_discount_inr?: number | null
+          returning_min_orders?: number
+          returning_min_subtotal_inr?: number
+          returning_percent?: number
+          returning_product_ids?: string[]
+          returning_saree_types?: string[]
+          returning_start_at?: string | null
+          stack_auto_with_campaign?: boolean
+          stack_auto_with_coupon?: boolean
+          stack_auto_with_returning?: boolean
+          stack_campaign_with_coupon?: boolean
+          stack_returning_with_campaign?: boolean
+          stack_returning_with_coupon?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           active: boolean
@@ -49,7 +372,10 @@ export type Database = {
       }
       orders: {
         Row: {
+          coupon_code: string | null
           created_at: string
+          discount_breakdown: Json
+          discount_inr: number
           id: string
           items: Json
           razorpay_order_id: string | null
@@ -64,7 +390,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          coupon_code?: string | null
           created_at?: string
+          discount_breakdown?: Json
+          discount_inr?: number
           id?: string
           items: Json
           razorpay_order_id?: string | null
@@ -79,7 +408,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          coupon_code?: string | null
           created_at?: string
+          discount_breakdown?: Json
+          discount_inr?: number
           id?: string
           items?: Json
           razorpay_order_id?: string | null
@@ -463,6 +795,19 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      reserve_coupon: {
+        Args: {
+          _coupon_id: string
+          _discount_inr: number
+          _order_id: string
+          _user_id: string
+        }
+        Returns: string
+      }
+      settle_coupon_redemption: {
+        Args: { _order_id: string; _status: string }
+        Returns: undefined
       }
     }
     Enums: {
