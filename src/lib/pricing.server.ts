@@ -10,6 +10,7 @@ export type DiscountSettings = Database["public"]["Tables"]["discount_settings"]
 export type Campaign = Database["public"]["Tables"]["discount_campaigns"]["Row"];
 export type Coupon = Database["public"]["Tables"]["coupons"]["Row"];
 
+/** Legacy status list kept for reference; paid-ness now lives on orders.payment_status. */
 export const PAID_STATUSES = ["paid", "shipped", "delivered"] as const;
 
 const rupees = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
@@ -167,7 +168,7 @@ export async function buildQuote(ctx: PricingContext, opts: QuoteOptions): Promi
       .from("orders")
       .select("id", { count: "exact", head: true })
       .eq("user_id", ctx.userId)
-      .in("status", PAID_STATUSES as never);
+      .eq("payment_status", "paid");
     paidOrders = count ?? 0;
   }
   const minOrders = s?.returning_min_orders ?? 1;
