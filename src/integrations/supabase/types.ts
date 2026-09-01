@@ -44,6 +44,76 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notification_reads: {
+        Row: {
+          admin_id: string
+          notification_id: string
+          read_at: string
+        }
+        Insert: {
+          admin_id: string
+          notification_id: string
+          read_at?: string
+        }
+        Update: {
+          admin_id?: string
+          notification_id?: string
+          read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notification_reads_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "admin_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_notifications: {
+        Row: {
+          amount_inr: number
+          created_at: string
+          customer_name: string | null
+          id: string
+          item_count: number
+          order_id: string | null
+          order_status: string | null
+          payment_status: string | null
+          type: string
+        }
+        Insert: {
+          amount_inr?: number
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          item_count?: number
+          order_id?: string | null
+          order_status?: string | null
+          payment_status?: string | null
+          type: string
+        }
+        Update: {
+          amount_inr?: number
+          created_at?: string
+          customer_name?: string | null
+          id?: string
+          item_count?: number
+          order_id?: string | null
+          order_status?: string | null
+          payment_status?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupon_redemptions: {
         Row: {
           coupon_code: string
@@ -370,14 +440,52 @@ export type Database = {
         }
         Relationships: []
       }
+      order_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_status: string
+          order_id: string
+          previous_status: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status: string
+          order_id: string
+          previous_status?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status?: string
+          order_id?: string
+          previous_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
+          archived: boolean
           coupon_code: string | null
           created_at: string
           discount_breakdown: Json
           discount_inr: number
           id: string
           items: Json
+          paid_at: string | null
+          payment_status: string
           razorpay_order_id: string | null
           razorpay_payment_id: string | null
           razorpay_signature: string | null
@@ -390,12 +498,15 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived?: boolean
           coupon_code?: string | null
           created_at?: string
           discount_breakdown?: Json
           discount_inr?: number
           id?: string
           items: Json
+          paid_at?: string | null
+          payment_status?: string
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
           razorpay_signature?: string | null
@@ -408,12 +519,15 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived?: boolean
           coupon_code?: string | null
           created_at?: string
           discount_breakdown?: Json
           discount_inr?: number
           id?: string
           items?: Json
+          paid_at?: string | null
+          payment_status?: string
           razorpay_order_id?: string | null
           razorpay_payment_id?: string | null
           razorpay_signature?: string | null
@@ -819,6 +933,11 @@ export type Database = {
         | "delivered"
         | "cancelled"
         | "failed"
+        | "confirmed"
+        | "processing"
+        | "packed"
+        | "in_transit"
+        | "refunded"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -954,6 +1073,11 @@ export const Constants = {
         "delivered",
         "cancelled",
         "failed",
+        "confirmed",
+        "processing",
+        "packed",
+        "in_transit",
+        "refunded",
       ],
     },
   },
