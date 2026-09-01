@@ -350,7 +350,6 @@ export const discountAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const paid = ["paid", "shipped", "delivered"] as const;
     const [orders, redemptions, campaigns] = await Promise.all([
       context.supabase
         .from("orders")
