@@ -167,7 +167,7 @@ export async function buildQuote(ctx: PricingContext, opts: QuoteOptions): Promi
       .from("orders")
       .select("id", { count: "exact", head: true })
       .eq("user_id", ctx.userId)
-      .in("status", PAID_STATUSES as never);
+      .eq("payment_status", "paid");
     paidOrders = count ?? 0;
   }
   const minOrders = s?.returning_min_orders ?? 1;

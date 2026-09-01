@@ -173,7 +173,10 @@ export const verifyPayment = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("orders")
       .update({
-        status: "paid",
+        // Payment facts and operational status are tracked separately.
+        status: "confirmed",
+        payment_status: "paid",
+        paid_at: new Date().toISOString(),
         razorpay_payment_id: data.razorpay_payment_id,
         razorpay_signature: data.razorpay_signature,
       })
@@ -225,9 +228,34 @@ export const listMyOrders = createServerFn({ method: "GET" })
     const { data, error } = await context.supabase
       .from("orders")
       .select(
-        "id,items,subtotal_inr,discount_inr,discount_breakdown,coupon_code,total_inr,status,created_at",
+        "id,items,subtotal_inr,discount_inr,discount_breakdown,coupon_code,total_inr,status,payment_status,created_at",
       )
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data ?? [];
+  });
+
+/** Read-only tracking data for one of the caller's OWN orders (RLS enforced). */
+export const getMyOrderTracking = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ orderId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: order, error } = await context.supabase
+      .from("orders")
+      .select(
+        "id,items,subtotal_inr,shipping_inr,discount_inr,discount_breakdown,coupon_code,total_inr,status,payment_status,created_at,shipping_address",
+      )
+      .eq("id", data.orderId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!order) throw new Error("Order not found");
+
+    const { data: history } = await context.supabase
+      .from("order_status_history")
+      .select("previous_status,new_status,created_at")
+      .eq("order_id", data.orderId)
+      .order("created_at", { ascending: true });
+
+    return { order, history: history ?? [] };
   });

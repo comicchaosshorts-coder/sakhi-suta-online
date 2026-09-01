@@ -355,7 +355,7 @@ export const discountAnalytics = createServerFn({ method: "GET" })
       context.supabase
         .from("orders")
         .select("id,total_inr,discount_inr,discount_breakdown,coupon_code,status,created_at")
-        .in("status", paid)
+        .eq("payment_status", "paid")
         .order("created_at", { ascending: false })
         .limit(1000),
       context.supabase
