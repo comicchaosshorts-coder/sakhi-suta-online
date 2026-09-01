@@ -420,3 +420,178 @@ export const deletePromoContent = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// ================= ORDER MANAGEMENT (admin) =================
+import { ADMIN_SETTABLE_STATUSES } from "./order-status";
+
+const ORDER_SELECT =
+  "id,user_id,items,subtotal_inr,discount_inr,coupon_code,total_inr,status,payment_status,archived,paid_at,razorpay_order_id,razorpay_payment_id,created_at,updated_at,shipping_address";
+
+/** Filterable admin order list. Oldest-first for pending so abandoned orders surface. */
+export const adminListOrdersFiltered = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        status: z.string().max(30).nullish(),
+        includeArchived: z.boolean().default(false),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    let q = context.supabase.from("orders").select(ORDER_SELECT);
+    if (data.status) q = q.eq("status", data.status as never);
+    if (!data.includeArchived) q = q.eq("archived", false);
+    q =
+      data.status === "pending"
+        ? q.order("created_at", { ascending: true })
+        : q.order("created_at", { ascending: false });
+    const { data: rows, error } = await q.limit(500);
+    if (error) throw error;
+    return rows ?? [];
+  });
+
+export const adminUpdateOrderStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        orderId: z.string().uuid(),
+        status: z.enum(ADMIN_SETTABLE_STATUSES),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    // Operational status only — payment fields are never touched here.
+    const { error } = await context.supabase
+      .from("orders")
+      .update({ status: data.status as never })
+      .eq("id", data.orderId);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+/** Safe cleanup: cancel + archive. Never marks payment, never touches stock. */
+export const adminCancelArchiveOrders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ orderIds: z.array(z.string().uuid()).min(1).max(200) }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: rows, error: fErr } = await context.supabase
+      .from("orders")
+      .select("id,status,payment_status")
+      .in("id", data.orderIds);
+    if (fErr) throw fErr;
+
+    // Only unpaid, non-final orders are eligible for bulk cancellation.
+    const eligible = (rows ?? [])
+      .filter(
+        (o) =>
+          o.payment_status !== "paid" &&
+          ["pending", "failed", "cancelled"].includes(String(o.status)),
+      )
+      .map((o) => o.id);
+    if (eligible.length === 0) return { cancelled: 0, skipped: (rows ?? []).length };
+
+    const { error } = await context.supabase
+      .from("orders")
+      .update({ status: "cancelled" as never, archived: true })
+      .in("id", eligible);
+    if (error) throw error;
+
+    // Release any reserved coupon uses back to the pool (never consumes them).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    for (const id of eligible) {
+      await supabaseAdmin.rpc("settle_coupon_redemption", { _order_id: id, _status: "released" });
+    }
+    return { cancelled: eligible.length, skipped: (rows ?? []).length - eligible.length };
+  });
+
+/** Permanent delete — only for clearly unpaid test/abandoned orders. */
+export const adminDeleteTestOrder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ orderId: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: order, error: fErr } = await context.supabase
+      .from("orders")
+      .select("id,status,payment_status,razorpay_payment_id")
+      .eq("id", data.orderId)
+      .maybeSingle();
+    if (fErr) throw fErr;
+    if (!order) throw new Error("Order not found");
+    if (
+      order.payment_status === "paid" ||
+      order.payment_status === "refunded" ||
+      order.razorpay_payment_id ||
+      !["pending", "failed", "cancelled"].includes(String(order.status))
+    ) {
+      throw new Error("This order has payment history and cannot be deleted. Archive it instead.");
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Release the coupon hold first so usage counts stay accurate.
+    await supabaseAdmin.rpc("settle_coupon_redemption", {
+      _order_id: data.orderId,
+      _status: "released",
+    });
+    const { error } = await supabaseAdmin.from("orders").delete().eq("id", data.orderId);
+    if (error) throw error;
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId,
+      action: "delete_test_order",
+      entity: "orders",
+      entity_id: data.orderId,
+      details: { status: order.status, payment_status: order.payment_status },
+    });
+    return { ok: true };
+  });
+
+// ================= ADMIN NOTIFICATIONS =================
+export const adminListNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const [{ data: rows, error }, { data: reads }] = await Promise.all([
+      context.supabase
+        .from("admin_notifications")
+        .select("id,type,order_id,customer_name,item_count,amount_inr,payment_status,order_status,created_at")
+        .order("created_at", { ascending: false })
+        .limit(200),
+      context.supabase
+        .from("admin_notification_reads")
+        .select("notification_id")
+        .eq("admin_id", context.userId),
+    ]);
+    if (error) throw error;
+    const readSet = new Set((reads ?? []).map((r) => r.notification_id));
+    return (rows ?? []).map((r) => ({ ...r, read: readSet.has(r.id) }));
+  });
+
+export const adminMarkNotificationsRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ ids: z.array(z.string().uuid()).max(500).nullish(), all: z.boolean().default(false) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    let ids = data.ids ?? [];
+    if (data.all) {
+      const { data: rows } = await context.supabase
+        .from("admin_notifications")
+        .select("id")
+        .limit(500);
+      ids = (rows ?? []).map((r) => r.id);
+    }
+    if (ids.length === 0) return { ok: true };
+    const { error } = await context.supabase
+      .from("admin_notification_reads")
+      .upsert(
+        ids.map((id) => ({ notification_id: id, admin_id: context.userId })),
+        { onConflict: "notification_id,admin_id", ignoreDuplicates: true },
+      );
+    if (error) throw error;
+    return { ok: true };
+  });
