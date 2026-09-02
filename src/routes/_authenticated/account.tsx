@@ -4,6 +4,8 @@ import { listMyOrders } from "@/lib/orders.functions";
 import { listWishlist } from "@/lib/user.functions";
 import { isCurrentUserAdmin } from "@/lib/admin.functions";
 import { formatINR } from "@/lib/format";
+import { STATUS_LABELS } from "@/lib/order-status";
+
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/account")({
