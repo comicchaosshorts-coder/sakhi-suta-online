@@ -10,7 +10,11 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 function Dash() {
   const orders = useQuery({ queryKey: ["admin-orders"], queryFn: () => adminListOrders() });
   const products = useQuery({ queryKey: ["admin-products"], queryFn: () => adminListProducts() });
-  const revenue = orders.data?.filter((o) => o.status === "paid").reduce((s, o) => s + o.total_inr, 0) ?? 0;
+  const revenue =
+    orders.data
+      ?.filter((o) => (o as { payment_status?: string }).payment_status === "paid")
+      .reduce((s, o) => s + o.total_inr, 0) ?? 0;
+
 
   return (
     <div>
