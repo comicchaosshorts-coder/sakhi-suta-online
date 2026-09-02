@@ -50,11 +50,16 @@ function Account() {
         ) : (
           <div className="mt-4 space-y-3">
             {orders.data.map((o) => (
-              <div key={o.id} className="rounded-xl glass p-4 text-sm">
+              <Link
+                key={o.id}
+                to="/order/$id"
+                params={{ id: o.id }}
+                className="block rounded-xl glass p-4 text-sm hover:ring-1 hover:ring-primary/40"
+              >
                 <div className="flex justify-between">
                   <span className="font-mono text-xs text-muted-foreground">#{o.id.slice(0, 8)}</span>
                   <span className="rounded-full bg-primary/15 px-3 py-0.5 text-xs uppercase tracking-widest text-primary">
-                    {o.status}
+                    {STATUS_LABELS[o.status] ?? o.status}
                   </span>
                 </div>
                 <div className="mt-2 flex justify-between">
@@ -63,9 +68,11 @@ function Account() {
                   </span>
                   <span className="font-semibold">{formatINR(o.total_inr)}</span>
                 </div>
-              </div>
+                <div className="mt-1 text-xs text-primary">Track order →</div>
+              </Link>
             ))}
           </div>
+
         )}
       </section>
 
