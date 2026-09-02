@@ -1,6 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { adminListInquiries, adminListTestimonials } from "@/lib/admin.functions";
+import {
+  adminListInquiries,
+  adminListTestimonials,
+  adminListNotifications,
+} from "@/lib/admin.functions";
 
 type Row = { created_at: string };
 
@@ -40,17 +44,19 @@ export function useAdminBadges() {
   const { data } = useQuery({
     queryKey: ["admin-badges"],
     queryFn: async () => {
-      const [inq, tes] = await Promise.all([
+      const [inq, tes, notifs] = await Promise.all([
         adminListInquiries() as Promise<Row[]>,
         adminListTestimonials() as Promise<Row[]>,
+        adminListNotifications() as Promise<{ read: boolean }[]>,
       ]);
       return {
         inquiries: latest(inq) > getSeen("inquiries"),
         testimonials: latest(tes) > getSeen("testimonials"),
+        notifications: notifs.filter((n) => !n.read).length,
       };
     },
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
-  return data ?? { inquiries: false, testimonials: false };
+  return data ?? { inquiries: false, testimonials: false, notifications: 0 };
 }

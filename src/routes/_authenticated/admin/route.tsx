@@ -15,6 +15,11 @@ function AdminLayout() {
   const badges = useAdminBadges();
   const nav = [
     { to: "/admin", label: "Dashboard" },
+    {
+      to: "/admin/notifications",
+      label: badges.notifications ? `Notifications (${badges.notifications})` : "Notifications",
+      dot: badges.notifications > 0,
+    },
     { to: "/admin/branding", label: "Branding & Map" },
     { to: "/admin/slides", label: "Slides" },
     { to: "/admin/promos", label: "Promos" },
@@ -25,6 +30,7 @@ function AdminLayout() {
     { to: "/admin/inquiries", label: "Inquiries", dot: badges.inquiries },
     { to: "/admin/testimonials", label: "Testimonials", dot: badges.testimonials },
   ] as const;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
       <div className="mb-8 flex flex-wrap gap-2">
