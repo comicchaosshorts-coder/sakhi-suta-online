@@ -56,7 +56,7 @@ function TrackOrder() {
     );
   }
 
-  const order = q.data.order as {
+  const order = q.data.order as unknown as {
     id: string;
     status: string;
     payment_status: string;
