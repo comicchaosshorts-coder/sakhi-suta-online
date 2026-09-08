@@ -7,13 +7,21 @@ export const listHeroSlides = createServerFn({ method: "GET" }).handler(async ()
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("hero_slides")
-    .select("id,image_url,caption,link_url,display_order")
+    .select(
+      "id,image_url,mobile_image_url,caption,title,description,button_text,button_link,banner_type,link_url,display_order",
+    )
     .eq("active", true)
     .order("display_order", { ascending: true });
   if (error) throw error;
   const rows = data ?? [];
   return await Promise.all(
-    rows.map(async (r) => ({ ...r, image_url: await resolveImage(supabase, r.image_url) })),
+    rows.map(async (r) => ({
+      ...r,
+      image_url: await resolveImage(supabase, r.image_url),
+      mobile_image_url: r.mobile_image_url
+        ? await resolveImage(supabase, r.mobile_image_url)
+        : null,
+    })),
   );
 });
 
