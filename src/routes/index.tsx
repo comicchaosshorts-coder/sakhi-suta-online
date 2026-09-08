@@ -8,7 +8,7 @@ import { listHeroSlides, listTestimonials } from "@/lib/homepage.functions";
 import { listPromoContent } from "@/lib/promos.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
-import { HeroCarousel } from "@/components/site/HeroCarousel";
+import { BannerSlider } from "@/components/site/BannerSlider";
 import { TestimonialsSection } from "@/components/site/TestimonialsSection";
 import { Coverflow3D } from "@/components/site/Coverflow3D";
 import { OfferMarquee } from "@/components/site/OfferMarquee";
@@ -69,24 +69,16 @@ function Home() {
     <div>
       <OfferMarquee items={marquee} />
 
-      {/* HERO */}
+      {/* BANNER SLIDER */}
+      {slides.length > 0 && <BannerSlider slides={slides} />}
+
+      {/* HERO TEXT */}
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0 -z-10 opacity-80"
           style={{ background: "var(--gradient-luxe)" }}
         />
         <div className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-14">
-          {slides.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="mb-12"
-            >
-              <HeroCarousel slides={slides} />
-            </motion.div>
-          )}
-
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -95,6 +87,7 @@ function Home() {
           >
             A heritage house of drape
           </motion.p>
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}

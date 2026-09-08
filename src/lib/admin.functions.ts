@@ -234,7 +234,13 @@ export const upsertHeroSlide = createServerFn({ method: "POST" })
       .object({
         id: z.string().uuid().optional(),
         image_url: z.string().min(1).max(1000),
+        mobile_image_url: z.string().max(1000).optional().nullable(),
         caption: z.string().max(200).optional().nullable(),
+        title: z.string().max(200).optional().nullable(),
+        description: z.string().max(600).optional().nullable(),
+        button_text: z.string().max(60).optional().nullable(),
+        button_link: z.string().max(500).optional().nullable(),
+        banner_type: z.enum(["image_only", "image_text", "promotional"]),
         link_url: z.string().max(500).optional().nullable(),
         display_order: z.number().int().min(0).max(1000),
         active: z.boolean(),
@@ -245,7 +251,13 @@ export const upsertHeroSlide = createServerFn({ method: "POST" })
     await assertAdmin(context);
     const payload = {
       image_url: data.image_url,
+      mobile_image_url: data.mobile_image_url ?? null,
       caption: data.caption ?? null,
+      title: data.title ?? null,
+      description: data.description ?? null,
+      button_text: data.button_text ?? null,
+      button_link: data.button_link ?? null,
+      banner_type: data.banner_type,
       link_url: data.link_url ?? null,
       display_order: data.display_order,
       active: data.active,
