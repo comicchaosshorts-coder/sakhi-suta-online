@@ -8,7 +8,7 @@ import { listHeroSlides, listTestimonials } from "@/lib/homepage.functions";
 import { listPromoContent } from "@/lib/promos.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
-import { HeroCarousel } from "@/components/site/HeroCarousel";
+import { BannerSlider } from "@/components/site/BannerSlider";
 import { TestimonialsSection } from "@/components/site/TestimonialsSection";
 import { Coverflow3D } from "@/components/site/Coverflow3D";
 import { OfferMarquee } from "@/components/site/OfferMarquee";
