@@ -13,6 +13,7 @@ import { TestimonialsSection } from "@/components/site/TestimonialsSection";
 import { Coverflow3D } from "@/components/site/Coverflow3D";
 import { OfferMarquee } from "@/components/site/OfferMarquee";
 import { UspStrip } from "@/components/site/UspStrip";
+import { CategoryTiles } from "@/components/site/CategoryTiles";
 
 const homeQuery = queryOptions({
   queryKey: ["home"],
@@ -63,7 +64,6 @@ function Home() {
   const marquee = promos.filter((p) => p.kind === "marquee");
   const usps = promos.filter((p) => p.kind === "usp");
   const featured = products.filter((p) => (p as { featured?: boolean }).featured);
-  const newArrivals = products.slice(0, 8);
 
   return (
     <div>
@@ -125,7 +125,7 @@ function Home() {
                 to="/shop"
                 className="inline-flex items-center justify-center rounded-full bg-primary px-7 py-3 text-sm font-medium text-primary-foreground shadow-[var(--shadow-gold)] transition hover:bg-primary-glow"
               >
-                Shop the collection
+                Our Collection
               </Link>
               <Link
                 to="/join"
@@ -143,6 +143,7 @@ function Home() {
               transition={{ duration: 0.7, delay: 0.15 }}
               className="mt-14"
             >
+              <h2 className="mb-8 text-center font-serif text-4xl md:text-5xl">New Arrivals</h2>
               <Coverflow3D products={products} />
             </motion.div>
           )}
@@ -151,25 +152,43 @@ function Home() {
 
       <UspStrip items={usps} />
 
-      {/* NEW ARRIVALS RAIL */}
-      {newArrivals.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
-          <div className="mb-8 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-primary/70">Fresh off the loom</p>
-              <h2 className="mt-2 font-serif text-4xl md:text-5xl">New arrivals</h2>
-            </div>
-            <Link to="/shop" className="shrink-0 text-sm font-medium text-primary hover:underline">
-              View all →
-            </Link>
-          </div>
+      <CategoryTiles products={products} />
+
+      {/* FULL CATALOGUE */}
+      <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
+        <div className="mb-10 flex items-end justify-between">
+          <h2 className="font-serif text-4xl md:text-5xl">OUR COLLECTION</h2>
+          <Link to="/shop" className="text-sm font-medium text-primary hover:underline">
+            Open shop →
+          </Link>
+        </div>
+        {products.length === 0 ? (
+          <p className="rounded-2xl glass p-10 text-center text-sm text-muted-foreground">
+            The atelier is being dressed. Add products from the admin panel.
+          </p>
+        ) : (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-            {newArrivals.map((p) => (
+            {products.map((p) => (
               <ProductCard key={p.id} p={p} />
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
+
+      {/* THE COLLECTION — map */}
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+        <div className="mb-10 text-center">
+          <p className="text-xs uppercase tracking-[0.4em] text-primary/70">The Collection</p>
+          <h2 className="mt-2 font-serif text-4xl md:text-5xl">Shop by region</h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground">
+            Every state, its own loom. Hover any region to trace its weaves; click to enter its
+            collection.
+          </p>
+        </div>
+        <div className="rounded-3xl glass p-6">
+          <IndiaMap states={states} />
+        </div>
+      </section>
 
       {/* BESTSELLERS / FEATURED */}
       {featured.length > 0 && (
@@ -187,45 +206,6 @@ function Home() {
           </div>
         </section>
       )}
-
-      {/* THE COLLECTION — map */}
-      <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-        <div className="mb-10 text-center">
-          <p className="text-xs uppercase tracking-[0.4em] text-primary/70">The Collection</p>
-          <h2 className="mt-2 font-serif text-4xl md:text-5xl">Shop by region</h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground">
-            Every state, its own loom. Hover any region to trace its weaves; click to enter its
-            collection.
-          </p>
-        </div>
-        <div className="rounded-3xl glass p-6">
-          <IndiaMap states={states} />
-        </div>
-      </section>
-
-      {/* FULL CATALOGUE */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.4em] text-primary/70">The Catalogue</p>
-            <h2 className="mt-2 font-serif text-4xl md:text-5xl">Every drape</h2>
-          </div>
-          <Link to="/shop" className="text-sm font-medium text-primary hover:underline">
-            Open shop →
-          </Link>
-        </div>
-        {products.length === 0 ? (
-          <p className="rounded-2xl glass p-10 text-center text-sm text-muted-foreground">
-            The atelier is being dressed. Add products from the admin panel.
-          </p>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-            {products.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
-          </div>
-        )}
-      </section>
 
       {/* TESTIMONIALS */}
       <TestimonialsSection items={testimonials} />
