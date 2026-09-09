@@ -87,3 +87,31 @@ export const submitPartnerInquiry = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// ---- CATEGORY TILES (public read) ----
+export const listCategoryTiles = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("category_tiles")
+    .select("id,name,image_url,link_url,display_order")
+    .eq("active", true)
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return await Promise.all(
+    (data ?? []).map(async (r) => ({
+      ...r,
+      image_url: r.image_url ? await resolveImage(supabase, r.image_url) : "",
+    })),
+  );
+});
+
+// ---- HOMEPAGE PICKS (public read) ----
+export const listHomepagePicks = createServerFn({ method: "GET" }).handler(async () => {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("homepage_picks")
+    .select("id,section,product_id,display_order")
+    .order("display_order", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+});

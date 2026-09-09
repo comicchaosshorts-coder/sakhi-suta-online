@@ -114,6 +114,39 @@ export type Database = {
           },
         ]
       }
+      category_tiles: {
+        Row: {
+          active: boolean
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+          link_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coupon_redemptions: {
         Row: {
           coupon_code: string
@@ -457,6 +490,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      homepage_picks: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          product_id: string
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          product_id: string
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          product_id?: string
+          section?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homepage_picks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       order_status_history: {
         Row: {

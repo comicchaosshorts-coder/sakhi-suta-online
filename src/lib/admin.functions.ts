@@ -607,3 +607,130 @@ export const adminMarkNotificationsRead = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
+// ============ CATEGORY TILES ============
+export const adminListCategoryTiles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("category_tiles")
+      .select("*")
+      .order("display_order", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const upsertCategoryTile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        name: z.string().trim().min(1).max(80),
+        image_url: z.string().max(1000),
+        link_url: z.string().max(500).optional().nullable(),
+        display_order: z.number().int().min(0).max(1000),
+        active: z.boolean(),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const payload = {
+      name: data.name,
+      image_url: data.image_url,
+      link_url: data.link_url || null,
+      display_order: data.display_order,
+      active: data.active,
+    };
+    if (data.id) {
+      const { error } = await context.supabase
+        .from("category_tiles")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw error;
+      return { ok: true, id: data.id };
+    }
+    const { data: row, error } = await context.supabase
+      .from("category_tiles")
+      .insert(payload)
+      .select("id")
+      .maybeSingle();
+    if (error) throw error;
+    return { ok: true, id: row?.id };
+  });
+
+export const deleteCategoryTile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("category_tiles").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ============ HOMEPAGE PICKS (New Arrivals / Bestsellers) ============
+const sectionSchema = z.enum(["new_arrivals", "best_sellers"]);
+
+export const adminListHomepagePicks = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const { data, error } = await context.supabase
+      .from("homepage_picks")
+      .select("id,section,product_id,display_order")
+      .order("display_order", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+export const addHomepagePick = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ section: sectionSchema, product_id: z.string().uuid() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { data: rows } = await context.supabase
+      .from("homepage_picks")
+      .select("display_order")
+      .eq("section", data.section)
+      .order("display_order", { ascending: false })
+      .limit(1);
+    const next = ((rows?.[0]?.display_order as number | undefined) ?? -1) + 1;
+    const { error } = await context.supabase
+      .from("homepage_picks")
+      .upsert(
+        { section: data.section, product_id: data.product_id, display_order: next },
+        { onConflict: "section,product_id" },
+      );
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const removeHomepagePick = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("homepage_picks").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const reorderHomepagePick = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) =>
+    z.object({ id: z.string().uuid(), display_order: z.number().int().min(0).max(1000) }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase
+      .from("homepage_picks")
+      .update({ display_order: data.display_order })
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
