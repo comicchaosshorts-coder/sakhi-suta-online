@@ -4,7 +4,12 @@ import { motion } from "framer-motion";
 import { getSiteSettings } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { listProducts } from "@/lib/products.functions";
-import { listHeroSlides, listTestimonials } from "@/lib/homepage.functions";
+import {
+  listCategoryTiles,
+  listHeroSlides,
+  listHomepagePicks,
+  listTestimonials,
+} from "@/lib/homepage.functions";
 import { listPromoContent } from "@/lib/promos.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -18,15 +23,18 @@ import { CategoryTiles } from "@/components/site/CategoryTiles";
 const homeQuery = queryOptions({
   queryKey: ["home"],
   queryFn: async () => {
-    const [settings, states, products, slides, testimonials, promos] = await Promise.all([
-      getSiteSettings(),
-      listStates(),
-      listProducts({ data: {} }),
-      listHeroSlides(),
-      listTestimonials(),
-      listPromoContent(),
-    ]);
-    return { settings, states, products, slides, testimonials, promos };
+    const [settings, states, products, slides, testimonials, promos, tiles, picks] =
+      await Promise.all([
+        getSiteSettings(),
+        listStates(),
+        listProducts({ data: {} }),
+        listHeroSlides(),
+        listTestimonials(),
+        listPromoContent(),
+        listCategoryTiles(),
+        listHomepagePicks(),
+      ]);
+    return { settings, states, products, slides, testimonials, promos, tiles, picks };
   },
 });
 
@@ -57,13 +65,27 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
-  const { settings, states, products, slides, testimonials, promos } = data;
+  const { settings, states, products, slides, testimonials, promos, tiles, picks } = data;
 
   const tagline = settings?.tagline ?? "Elegance Woven in Every Thread";
   const brand = settings?.brand_name ?? "Sakhi Suta";
   const marquee = promos.filter((p) => p.kind === "marquee");
   const usps = promos.filter((p) => p.kind === "usp");
-  const featured = products.filter((p) => (p as { featured?: boolean }).featured);
+
+  const pickedBy = (section: string) =>
+    picks
+      .filter((p) => p.section === section)
+      .map((p) => products.find((prod) => prod.id === p.product_id))
+      .filter((p): p is (typeof products)[number] => Boolean(p));
+
+  const newArrivalsPicked = pickedBy("new_arrivals");
+  const newArrivals = newArrivalsPicked.length > 0 ? newArrivalsPicked : products;
+
+  const bestSellersPicked = pickedBy("best_sellers");
+  const featured =
+    bestSellersPicked.length > 0
+      ? bestSellersPicked
+      : products.filter((p) => (p as { featured?: boolean }).featured);
 
   return (
     <div>
@@ -144,7 +166,7 @@ function Home() {
               className="mt-14"
             >
               <h2 className="mb-8 text-center font-serif text-4xl md:text-5xl">New Arrivals</h2>
-              <Coverflow3D products={products} />
+              <Coverflow3D products={newArrivals} />
             </motion.div>
           )}
         </div>
@@ -152,7 +174,7 @@ function Home() {
 
       <UspStrip items={usps} />
 
-      <CategoryTiles products={products} />
+      <CategoryTiles products={products} tiles={tiles} />
 
       {/* FULL CATALOGUE */}
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
