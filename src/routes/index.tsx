@@ -166,7 +166,7 @@ function Home() {
               className="mt-14"
             >
               <h2 className="mb-8 text-center font-serif text-4xl md:text-5xl">New Arrivals</h2>
-              <Coverflow3D products={products} />
+              <Coverflow3D products={newArrivals} />
             </motion.div>
           )}
         </div>
@@ -174,7 +174,7 @@ function Home() {
 
       <UspStrip items={usps} />
 
-      <CategoryTiles products={products} />
+      <CategoryTiles products={products} tiles={tiles} />
 
       {/* FULL CATALOGUE */}
       <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
