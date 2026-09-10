@@ -4,7 +4,20 @@ import type { ProductCardData } from "@/components/site/ProductCard";
 
 const categories = ["Katan", "Banarasi", "Kanchipuram", "Paithani"];
 
-export function CategoryTiles({ products }: { products: ProductCardData[] }) {
+export type CategoryTile = {
+  id: string;
+  name: string;
+  image_url: string;
+  link_url: string | null;
+};
+
+export function CategoryTiles({
+  products,
+  tiles = [],
+}: {
+  products: ProductCardData[];
+  tiles?: CategoryTile[];
+}) {
   const railRef = useRef<HTMLDivElement>(null);
   const dragStart = useRef<{ x: number; scrollLeft: number } | null>(null);
 
