@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminInquiriesRouteImport } from './routes/_authenticated/admin/inquiries'
+import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminDiscountsRouteImport } from './routes/_authenticated/admin/discounts'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
 
@@ -156,6 +157,12 @@ const AuthenticatedAdminInquiriesRoute =
     path: '/inquiries',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminHomepageRoute =
+  AuthenticatedAdminHomepageRouteImport.update({
+    id: '/homepage',
+    path: '/homepage',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminDiscountsRoute =
   AuthenticatedAdminDiscountsRouteImport.update({
     id: '/discounts',
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
+  '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
+  '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -238,6 +247,7 @@ export interface FileRoutesById {
   '/state/$slug': typeof StateSlugRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
+  '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/state/$slug'
     | '/admin/branding'
     | '/admin/discounts'
+    | '/admin/homepage'
     | '/admin/inquiries'
     | '/admin/notifications'
     | '/admin/orders'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/state/$slug'
     | '/admin/branding'
     | '/admin/discounts'
+    | '/admin/homepage'
     | '/admin/inquiries'
     | '/admin/notifications'
     | '/admin/orders'
@@ -318,6 +330,7 @@ export interface FileRouteTypes {
     | '/state/$slug'
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/discounts'
+    | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/inquiries'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/orders'
@@ -506,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminInquiriesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/homepage': {
+      id: '/_authenticated/admin/homepage'
+      path: '/homepage'
+      fullPath: '/admin/homepage'
+      preLoaderRoute: typeof AuthenticatedAdminHomepageRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/discounts': {
       id: '/_authenticated/admin/discounts'
       path: '/discounts'
@@ -526,6 +546,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
   AuthenticatedAdminDiscountsRoute: typeof AuthenticatedAdminDiscountsRoute
+  AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminInquiriesRoute: typeof AuthenticatedAdminInquiriesRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -540,6 +561,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
     AuthenticatedAdminDiscountsRoute: AuthenticatedAdminDiscountsRoute,
+    AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminInquiriesRoute: AuthenticatedAdminInquiriesRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
