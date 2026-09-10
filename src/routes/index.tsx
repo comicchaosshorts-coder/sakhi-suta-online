@@ -65,13 +65,27 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
-  const { settings, states, products, slides, testimonials, promos } = data;
+  const { settings, states, products, slides, testimonials, promos, tiles, picks } = data;
 
   const tagline = settings?.tagline ?? "Elegance Woven in Every Thread";
   const brand = settings?.brand_name ?? "Sakhi Suta";
   const marquee = promos.filter((p) => p.kind === "marquee");
   const usps = promos.filter((p) => p.kind === "usp");
-  const featured = products.filter((p) => (p as { featured?: boolean }).featured);
+
+  const pickedBy = (section: string) =>
+    picks
+      .filter((p) => p.section === section)
+      .map((p) => products.find((prod) => prod.id === p.product_id))
+      .filter((p): p is (typeof products)[number] => Boolean(p));
+
+  const newArrivalsPicked = pickedBy("new_arrivals");
+  const newArrivals = newArrivalsPicked.length > 0 ? newArrivalsPicked : products;
+
+  const bestSellersPicked = pickedBy("best_sellers");
+  const featured =
+    bestSellersPicked.length > 0
+      ? bestSellersPicked
+      : products.filter((p) => (p as { featured?: boolean }).featured);
 
   return (
     <div>
