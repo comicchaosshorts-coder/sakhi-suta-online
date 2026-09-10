@@ -4,7 +4,12 @@ import { motion } from "framer-motion";
 import { getSiteSettings } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { listProducts } from "@/lib/products.functions";
-import { listHeroSlides, listTestimonials } from "@/lib/homepage.functions";
+import {
+  listCategoryTiles,
+  listHeroSlides,
+  listHomepagePicks,
+  listTestimonials,
+} from "@/lib/homepage.functions";
 import { listPromoContent } from "@/lib/promos.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -18,15 +23,18 @@ import { CategoryTiles } from "@/components/site/CategoryTiles";
 const homeQuery = queryOptions({
   queryKey: ["home"],
   queryFn: async () => {
-    const [settings, states, products, slides, testimonials, promos] = await Promise.all([
-      getSiteSettings(),
-      listStates(),
-      listProducts({ data: {} }),
-      listHeroSlides(),
-      listTestimonials(),
-      listPromoContent(),
-    ]);
-    return { settings, states, products, slides, testimonials, promos };
+    const [settings, states, products, slides, testimonials, promos, tiles, picks] =
+      await Promise.all([
+        getSiteSettings(),
+        listStates(),
+        listProducts({ data: {} }),
+        listHeroSlides(),
+        listTestimonials(),
+        listPromoContent(),
+        listCategoryTiles(),
+        listHomepagePicks(),
+      ]);
+    return { settings, states, products, slides, testimonials, promos, tiles, picks };
   },
 });
 
