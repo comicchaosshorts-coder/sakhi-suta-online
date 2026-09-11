@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatINR } from "@/lib/format";
+import { adminListProducts } from "@/lib/admin.functions";
 import {
   bulkGenerateCoupons,
   deleteCampaign,
@@ -342,9 +343,8 @@ function ProductPicker({
     <div className="mt-4 rounded-xl gold-border p-4">
       <p className="font-serif text-lg">Extra discount on specific products</p>
       <p className="mt-1 text-xs text-muted-foreground">
-        Leave empty to apply to the whole cart. Choose products to give an additional{" "}
-        {Number.isFinite(Number(selected.length)) ? "" : ""}percentage off only on those products at
-        checkout.
+        Leave empty to apply to the whole cart. Choose products to give the additional percentage
+        off only on those products at checkout.
       </p>
       <input
         className={`${inputCls} mt-3`}
