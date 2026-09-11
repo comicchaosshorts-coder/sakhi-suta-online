@@ -674,14 +674,18 @@ export type Database = {
       }
       products: {
         Row: {
+          bleaching_care: string
+          care_note: string | null
           compare_at_price_inr: number | null
           created_at: string
           description: string
+          drying_care: string
           fabric: string | null
           featured: boolean
           id: string
           images: string[]
           in_stock: boolean
+          ironing_care: string
           name: string
           occasion: string | null
           origin: string | null
@@ -689,19 +693,25 @@ export type Database = {
           saree_type: string | null
           slug: string
           state_id: string | null
+          storage_care: string
           updated_at: string
           variants: Json
+          washing_care: string
           work: string | null
         }
         Insert: {
+          bleaching_care?: string
+          care_note?: string | null
           compare_at_price_inr?: number | null
           created_at?: string
           description?: string
+          drying_care?: string
           fabric?: string | null
           featured?: boolean
           id?: string
           images?: string[]
           in_stock?: boolean
+          ironing_care?: string
           name: string
           occasion?: string | null
           origin?: string | null
@@ -709,19 +719,25 @@ export type Database = {
           saree_type?: string | null
           slug: string
           state_id?: string | null
+          storage_care?: string
           updated_at?: string
           variants?: Json
+          washing_care?: string
           work?: string | null
         }
         Update: {
+          bleaching_care?: string
+          care_note?: string | null
           compare_at_price_inr?: number | null
           created_at?: string
           description?: string
+          drying_care?: string
           fabric?: string | null
           featured?: boolean
           id?: string
           images?: string[]
           in_stock?: boolean
+          ironing_care?: string
           name?: string
           occasion?: string | null
           origin?: string | null
@@ -729,8 +745,10 @@ export type Database = {
           saree_type?: string | null
           slug?: string
           state_id?: string | null
+          storage_care?: string
           updated_at?: string
           variants?: Json
+          washing_care?: string
           work?: string | null
         }
         Relationships: [
