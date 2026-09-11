@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { CARE_VALUES } from "@/lib/product-care-values";
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
@@ -115,6 +116,12 @@ const ProductInput = z.object({
   in_stock: z.boolean().default(true),
   featured: z.boolean().default(false),
   variants: z.array(VariantInput).max(30).default([]),
+  washing_care: z.enum(CARE_VALUES.washing_care as [string, ...string[]]).default("not_specified"),
+  ironing_care: z.enum(CARE_VALUES.ironing_care as [string, ...string[]]).default("not_specified"),
+  bleaching_care: z.enum(CARE_VALUES.bleaching_care as [string, ...string[]]).default("not_specified"),
+  drying_care: z.enum(CARE_VALUES.drying_care as [string, ...string[]]).default("not_specified"),
+  storage_care: z.enum(CARE_VALUES.storage_care as [string, ...string[]]).default("not_specified"),
+  care_note: z.string().max(300).optional().nullable(),
 });
 
 export const upsertProduct = createServerFn({ method: "POST" })

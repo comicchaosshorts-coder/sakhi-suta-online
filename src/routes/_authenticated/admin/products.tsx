@@ -11,6 +11,7 @@ import {
 import { listStates } from "@/lib/states.functions";
 import { formatINR } from "@/lib/format";
 import { ImageCropper } from "@/components/site/ImageCropper";
+import { CARE_CATEGORIES, configuredCare } from "@/lib/product-care";
 
 export const Route = createFileRoute("/_authenticated/admin/products")({
   component: Products,
@@ -41,6 +42,12 @@ const emptyForm = {
   featured: false,
   in_stock: true,
   variants: [] as VariantForm[],
+  washing_care: "not_specified",
+  ironing_care: "not_specified",
+  bleaching_care: "not_specified",
+  drying_care: "not_specified",
+  storage_care: "not_specified",
+  care_note: "",
 };
 
 function newVariantId() {
