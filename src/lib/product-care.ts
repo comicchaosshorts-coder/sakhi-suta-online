@@ -69,16 +69,6 @@ export const CARE_CATEGORIES = [
   },
 ];
 
-export type CareKey = (typeof CARE_CATEGORIES)[number]["key"];
-
-export const CARE_VALUES: Record<CareKey, string[]> = CARE_CATEGORIES.reduce(
-  (acc, c) => {
-    acc[c.key] = c.options.map((o) => o.value);
-    return acc;
-  },
-  {} as Record<CareKey, string[]>,
-);
-
 export function careLabel(key: CareKey, value: string | null | undefined) {
   const cat = CARE_CATEGORIES.find((c) => c.key === key);
   return cat?.options.find((o) => o.value === value)?.label ?? null;
