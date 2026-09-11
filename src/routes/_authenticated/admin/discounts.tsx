@@ -540,6 +540,10 @@ function CampaignsTab() {
               onChange={(v) => setDraft({ ...draft, overrides_other_discounts: v })}
             />
           </div>
+          <ProductPicker
+            selected={(draft.product_ids ?? []) as string[]}
+            onChange={(ids) => setDraft({ ...draft, product_ids: ids })}
+          />
           <div className="mt-4 flex gap-2">
             <button
               disabled={save.isPending || draft.name.trim().length < 2}
