@@ -1,5 +1,7 @@
 import { Droplets, Flame, Ban, Wind, Package } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+export type { CareKey } from "@/lib/product-care-values";
+export { CARE_VALUES } from "@/lib/product-care-values";
 
 export const CARE_CATEGORIES = [
   {
