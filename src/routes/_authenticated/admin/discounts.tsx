@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatINR } from "@/lib/format";
+import { adminListProducts } from "@/lib/admin.functions";
 import {
   bulkGenerateCoupons,
   deleteCampaign,
@@ -313,7 +314,93 @@ const emptyCampaign = {
   priority: 0,
   stackable: false,
   overrides_other_discounts: false,
+  product_ids: [] as string[],
+  saree_types: [] as string[],
 };
+
+/** Pick the exact products an extra percentage discount applies to. */
+function ProductPicker({
+  selected,
+  onChange,
+}: {
+  selected: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-products-for-discounts"],
+    queryFn: () => adminListProducts(),
+  });
+  const [q, setQ] = useState("");
+  const products = (data ?? []) as Record<string, any>[];
+  const term = q.trim().toLowerCase();
+  const visible = term
+    ? products.filter((p) => String(p.name).toLowerCase().includes(term))
+    : products;
+  const toggleId = (id: string) =>
+    onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
+
+  return (
+    <div className="mt-4 rounded-xl gold-border p-4">
+      <p className="font-serif text-lg">Extra discount on specific products</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Leave empty to apply to the whole cart. Choose products to give the additional percentage
+        off only on those products at checkout.
+      </p>
+      <input
+        className={`${inputCls} mt-3`}
+        placeholder="Search products…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
+      {selected.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {selected.map((id) => {
+            const p = products.find((x) => x.id === id);
+            return (
+              <button
+                key={id}
+                onClick={() => toggleId(id)}
+                className="rounded-full bg-primary px-3 py-1 text-xs text-primary-foreground"
+              >
+                {p ? String(p.name) : "Product"} ✕
+              </button>
+            );
+          })}
+          <button onClick={() => onChange([])} className="rounded-full gold-border px-3 py-1 text-xs">
+            Clear all
+          </button>
+        </div>
+      )}
+      <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading products…</p>
+        ) : visible.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No products found.</p>
+        ) : (
+          visible.map((p) => (
+            <label
+              key={p.id}
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-primary/10"
+            >
+              <input
+                type="checkbox"
+                checked={selected.includes(p.id)}
+                onChange={() => toggleId(p.id)}
+              />
+              {Array.isArray(p.images) && p.images[0] ? (
+                <img src={p.images[0]} alt="" className="h-10 w-8 rounded object-cover" />
+              ) : null}
+              <span className="text-sm">{String(p.name)}</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {formatINR(Number(p.price_inr))}
+              </span>
+            </label>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CampaignsTab() {
   const qc = useQueryClient();
@@ -453,6 +540,10 @@ function CampaignsTab() {
               onChange={(v) => setDraft({ ...draft, overrides_other_discounts: v })}
             />
           </div>
+          <ProductPicker
+            selected={(draft.product_ids ?? []) as string[]}
+            onChange={(ids) => setDraft({ ...draft, product_ids: ids })}
+          />
           <div className="mt-4 flex gap-2">
             <button
               disabled={save.isPending || draft.name.trim().length < 2}
