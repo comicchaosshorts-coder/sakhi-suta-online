@@ -120,6 +120,12 @@ function Products() {
           images: form.images,
           featured: form.featured,
           in_stock: form.in_stock,
+          washing_care: form.washing_care,
+          ironing_care: form.ironing_care,
+          bleaching_care: form.bleaching_care,
+          drying_care: form.drying_care,
+          storage_care: form.storage_care,
+          care_note: form.care_note.trim() || null,
           variants: form.variants.map((v) => ({
             id: v.id,
             name: v.name,
@@ -398,6 +404,45 @@ function Products() {
               className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
             />
           </label>
+
+          <div className="space-y-3 rounded-lg border border-border/50 bg-input/20 p-3">
+            <span className="block text-xs uppercase tracking-widest text-muted-foreground">
+              Product care
+            </span>
+            {CARE_CATEGORIES.map((c) => (
+              <label key={c.key} className="block">
+                <span className="mb-1 block text-[11px] uppercase tracking-widest text-muted-foreground">
+                  {c.label}
+                </span>
+                <select
+                  value={form[c.key]}
+                  onChange={(e) => setForm({ ...form, [c.key]: e.target.value })}
+                  className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
+                >
+                  {c.options.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+            <label className="block">
+              <span className="mb-1 block text-[11px] uppercase tracking-widest text-muted-foreground">
+                Additional care instructions (optional)
+              </span>
+              <textarea
+                rows={2}
+                maxLength={300}
+                value={form.care_note}
+                onChange={(e) => setForm({ ...form, care_note: e.target.value })}
+                className="w-full rounded-md border border-input bg-input/40 px-3 py-2 text-sm"
+              />
+              <span className="mt-1 block text-[10px] text-muted-foreground">
+                {form.care_note.length}/300
+              </span>
+            </label>
+          </div>
 
           <div className="block">
             <div className="mb-1 flex items-center justify-between">
