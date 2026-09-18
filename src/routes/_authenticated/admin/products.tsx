@@ -645,6 +645,7 @@ function Products() {
                 <div className="font-serif">{p.name}</div>
                 <div className="text-xs text-muted-foreground">
                   {p.saree_type} · {p.in_stock ? "in stock" : "sold out"} {p.featured && "· featured"}
+                  {" · "}Care: {configuredCare(p as any).length}/5
                 </div>
               </div>
               <div className="text-sm text-primary">{formatINR(p.price_inr)}</div>
@@ -673,6 +674,12 @@ function Products() {
                           images: Array.isArray(v.images) ? (v.images as string[]).map(String) : [],
                         }))
                       : [],
+                    washing_care: (p as any).washing_care ?? "not_specified",
+                    ironing_care: (p as any).ironing_care ?? "not_specified",
+                    bleaching_care: (p as any).bleaching_care ?? "not_specified",
+                    drying_care: (p as any).drying_care ?? "not_specified",
+                    storage_care: (p as any).storage_care ?? "not_specified",
+                    care_note: (p as any).care_note ?? "",
                   })
                 }
                 className="rounded-full border border-border/60 px-3 py-1 text-xs hover:text-primary"
