@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-store";
 import { formatINR } from "@/lib/format";
 import { toggleWishlist } from "@/lib/user.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductCare } from "@/components/site/ProductCare";
 
 const q = (slug: string) =>
   queryOptions({
@@ -199,6 +200,8 @@ function ProductPage() {
             {product.work && <Meta label="Work" value={product.work} />}
             {product.occasion && <Meta label="Occasion" value={product.occasion} />}
           </dl>
+
+          <ProductCare product={product as any} />
 
           <div className="mt-10 flex flex-wrap gap-3">
             <button
