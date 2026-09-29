@@ -213,11 +213,12 @@ export const createProductImageUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const getPublicProductImageUrl = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((i) => z.object({ key: z.string().min(1).max(300) }).parse(i))
-  .handler(async ({ data }) => {
-    const { createPublicClient } = await import("./supabase-public.server");
-    const supabase = createPublicClient();
-    const { data: signed } = await supabase.storage
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed } = await supabaseAdmin.storage
       .from("product-images")
       .createSignedUrl(data.key, 60 * 60 * 24 * 365);
     return { url: signed?.signedUrl ?? null };

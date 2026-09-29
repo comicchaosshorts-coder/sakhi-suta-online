@@ -13,14 +13,20 @@ export function createPublicClient() {
 // Convert a stored image reference (either a full URL or a bucket key)
 // into a viewable URL. Signs private-bucket keys.
 export async function resolveImage(
-  supabase: SupabaseClient<Database>,
+  _supabase: SupabaseClient<Database>,
   ref: string,
   bucket = "product-images",
 ): Promise<string> {
   if (!ref) return "";
-  if (/^https?:\/\//i.test(ref)) return ref;
-  const key = ref.startsWith(`${bucket}/`) ? ref.slice(bucket.length + 1) : ref;
-  const { data } = await supabase.storage.from(bucket).createSignedUrl(key, 60 * 60 * 24 * 7);
+  let key = ref.startsWith(`${bucket}/`) ? ref.slice(bucket.length + 1) : ref;
+  if (/^https?:\/\//i.test(ref)) {
+    const marker = `/storage/v1/object/sign/${bucket}/`;
+    const markerIndex = ref.indexOf(marker);
+    if (markerIndex < 0) return ref;
+    key = decodeURIComponent(ref.slice(markerIndex + marker.length).split("?")[0]);
+  }
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.storage.from(bucket).createSignedUrl(key, 60 * 60 * 24 * 7);
   return data?.signedUrl ?? "";
 }
 
