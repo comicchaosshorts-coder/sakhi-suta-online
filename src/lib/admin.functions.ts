@@ -769,14 +769,24 @@ export const upsertManagedCategory = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ kind: z.enum(["main", "saree"]), category: categoryInput }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const table = data.kind === "main" ? "main_categories" : "saree_categories";
-    const payload = { name: data.category.name, slug: slugify(data.category.name), image_url: data.category.image_url, display_order: data.category.display_order, enabled: data.category.enabled, ...(data.kind === "main" ? { opens_saree_categories: Boolean(data.category.opens_saree_categories) } : {}) };
+    const common = { name: data.category.name, slug: slugify(data.category.name), image_url: data.category.image_url, display_order: data.category.display_order, enabled: data.category.enabled };
+    if (data.kind === "main") {
+      const payload = { ...common, opens_saree_categories: Boolean(data.category.opens_saree_categories) };
+      if (data.category.id) {
+        const { error } = await context.supabase.from("main_categories").update(payload).eq("id", data.category.id);
+        if (error) throw error;
+        return { id: data.category.id };
+      }
+      const { data: row, error } = await context.supabase.from("main_categories").insert(payload).select("id").single();
+      if (error) throw error;
+      return { id: row.id };
+    }
     if (data.category.id) {
-      const { error } = await context.supabase.from(table).update(payload).eq("id", data.category.id);
+      const { error } = await context.supabase.from("saree_categories").update(common).eq("id", data.category.id);
       if (error) throw error;
       return { id: data.category.id };
     }
-    const { data: row, error } = await context.supabase.from(table).insert(payload).select("id").single();
+    const { data: row, error } = await context.supabase.from("saree_categories").insert(common).select("id").single();
     if (error) throw error;
     return { id: row.id };
   });
@@ -786,7 +796,9 @@ export const deleteManagedCategory = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ kind: z.enum(["main", "saree"]), id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const { error } = await context.supabase.from(data.kind === "main" ? "main_categories" : "saree_categories").delete().eq("id", data.id);
+    const { error } = data.kind === "main"
+      ? await context.supabase.from("main_categories").delete().eq("id", data.id)
+      : await context.supabase.from("saree_categories").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
