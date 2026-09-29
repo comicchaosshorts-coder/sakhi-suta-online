@@ -19,6 +19,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SareesIndexRouteImport } from './routes/sarees.index'
 import { Route as StateSlugRouteImport } from './routes/state.$slug'
 import { Route as SareesSlugRouteImport } from './routes/sarees.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -89,6 +90,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SareesIndexRoute = SareesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SareesRoute,
 } as any)
 const StateSlugRoute = StateSlugRouteImport.update({
   id: '/state/$slug',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/product/$slug': typeof ProductSlugRoute
   '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
+  '/sarees/': typeof SareesIndexRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -246,7 +253,6 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
-  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -255,6 +261,7 @@ export interface FileRoutesByTo {
   '/product/$slug': typeof ProductSlugRoute
   '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
+  '/sarees': typeof SareesIndexRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -289,6 +296,7 @@ export interface FileRoutesById {
   '/product/$slug': typeof ProductSlugRoute
   '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
+  '/sarees/': typeof SareesIndexRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -323,6 +331,7 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/sarees/$slug'
     | '/state/$slug'
+    | '/sarees/'
     | '/admin/branding'
     | '/admin/categories'
     | '/admin/discounts'
@@ -345,7 +354,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
-    | '/sarees'
     | '/search'
     | '/shop'
     | '/account'
@@ -354,6 +362,7 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/sarees/$slug'
     | '/state/$slug'
+    | '/sarees'
     | '/admin/branding'
     | '/admin/categories'
     | '/admin/discounts'
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/sarees/$slug'
     | '/state/$slug'
+    | '/sarees/'
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/discounts'
@@ -491,6 +501,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/sarees/': {
+      id: '/sarees/'
+      path: '/'
+      fullPath: '/sarees/'
+      preLoaderRoute: typeof SareesIndexRouteImport
+      parentRoute: typeof SareesRoute
     }
     '/state/$slug': {
       id: '/state/$slug'
@@ -697,10 +714,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface SareesRouteChildren {
   SareesSlugRoute: typeof SareesSlugRoute
+  SareesIndexRoute: typeof SareesIndexRoute
 }
 
 const SareesRouteChildren: SareesRouteChildren = {
   SareesSlugRoute: SareesSlugRoute,
+  SareesIndexRoute: SareesIndexRoute,
 }
 
 const SareesRouteWithChildren =
