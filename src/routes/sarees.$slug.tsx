@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getCategoryProducts } from "@/lib/categories.functions";
 import { ProductCard } from "@/components/site/ProductCard";
+import type { ProductCardData } from "@/components/site/ProductCard";
 
 const categoryQuery = (slug: string) => queryOptions({
   queryKey: ["category-products", "sarees", slug],
@@ -36,6 +37,6 @@ function SareeCategoryProducts() {
   return <ProductListing title={data.sareeCategory?.name ?? "Sarees"} products={data.products} />;
 }
 
-function ProductListing({ title, products }: { title: string; products: Awaited<ReturnType<typeof getCategoryProducts>> extends infer R ? R extends { products: infer P } ? P : never : never }) {
+function ProductListing({ title, products }: { title: string; products: ProductCardData[] }) {
   return <main className="mx-auto max-w-7xl px-4 py-16 md:px-8"><Link to="/sarees" className="text-xs uppercase tracking-[0.3em] text-primary/70">← Saree Categories</Link><h1 className="mt-4 font-serif text-5xl">{title}</h1>{products.length === 0 ? <p className="mt-10 text-muted-foreground">This collection is being curated.</p> : <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} p={product} />)}</div>}</main>;
 }
