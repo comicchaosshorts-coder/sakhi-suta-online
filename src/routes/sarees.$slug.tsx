@@ -38,5 +38,5 @@ function SareeCategoryProducts() {
 }
 
 function ProductListing({ title, products }: { title: string; products: ProductCardData[] }) {
-  return <main className="mx-auto max-w-7xl px-4 py-16 md:px-8"><Link to="/sarees" className="text-xs uppercase tracking-[0.3em] text-primary/70">← Saree Categories</Link><h1 className="mt-4 font-serif text-5xl">{title}</h1>{products.length === 0 ? <p className="mt-10 text-muted-foreground">This collection is being curated.</p> : <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} p={product} />)}</div>}</main>;
+  return <main className="mx-auto max-w-7xl px-4 py-16 md:px-8"><Link to="/sarees" className="text-xs uppercase tracking-[0.3em] text-primary/70">← Saree Categories</Link><h1 className="mt-4 font-serif text-5xl">{title}</h1>{products.length === 0 ? <p className="mt-10 text-muted-foreground">No products available in this category yet</p> : <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">{products.map((product) => <ProductCard key={product.id} p={product} />)}</div>}</main>;
 }
