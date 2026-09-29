@@ -25,9 +25,7 @@ export async function resolveImage(
     if (markerIndex < 0) return ref;
     key = decodeURIComponent(ref.slice(markerIndex + marker.length).split("?")[0]);
   }
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.storage.from(bucket).createSignedUrl(key, 60 * 60 * 24 * 7);
-  return data?.signedUrl ?? "";
+  return `/api/public/media?bucket=${encodeURIComponent(bucket)}&key=${encodeURIComponent(key)}`;
 }
 
 export async function resolveImages(
