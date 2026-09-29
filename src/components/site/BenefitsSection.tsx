@@ -21,8 +21,8 @@ export function BenefitsSection() {
 
   return (
     <section className="border-y border-border bg-cream text-foreground">
-      <div className="mx-auto max-w-6xl px-4 py-14 md:px-8 md:py-20">
-        <div className={benefits.length >= 4 ? "grid grid-cols-2" : "grid grid-cols-2"}>
+      <div className="relative mx-auto max-w-6xl px-4 py-14 md:px-8 md:py-20">
+        <div className="grid grid-cols-2">
           {benefits.map((benefit, index) => {
             const Icon = icons[benefit.icon as keyof typeof icons] ?? Sparkles;
             return (
@@ -43,11 +43,11 @@ export function BenefitsSection() {
             );
           })}
         </div>
-        <div className="relative mx-auto -mt-2 grid w-fit place-items-center rounded-full bg-cream p-3 md:-mt-4">
+        <div className="absolute left-1/2 top-1/2 grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-cream p-2 md:p-3">
           <img
             src={logoAsset.url}
             alt="Sakhi Suta — Weaving Bonds, Celebrating Women"
-            className="h-20 w-20 object-contain md:h-28 md:w-28"
+            className="h-16 w-16 object-contain md:h-24 md:w-24"
           />
         </div>
       </div>
