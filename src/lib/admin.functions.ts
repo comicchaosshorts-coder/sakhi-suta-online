@@ -122,6 +122,8 @@ const ProductInput = z.object({
   drying_care: z.enum(CARE_VALUES.drying_care).default("not_specified"),
   storage_care: z.enum(CARE_VALUES.storage_care).default("not_specified"),
   care_note: z.string().max(300).optional().nullable(),
+  main_category_id: z.string().uuid().optional().nullable(),
+  saree_category_id: z.string().uuid().optional().nullable(),
 });
 
 export const upsertProduct = createServerFn({ method: "POST" })
@@ -211,11 +213,12 @@ export const createProductImageUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const getPublicProductImageUrl = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((i) => z.object({ key: z.string().min(1).max(300) }).parse(i))
-  .handler(async ({ data }) => {
-    const { createPublicClient } = await import("./supabase-public.server");
-    const supabase = createPublicClient();
-    const { data: signed } = await supabase.storage
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed } = await supabaseAdmin.storage
       .from("product-images")
       .createSignedUrl(data.key, 60 * 60 * 24 * 365);
     return { url: signed?.signedUrl ?? null };
@@ -738,6 +741,103 @@ export const reorderHomepagePick = createServerFn({ method: "POST" })
       .from("homepage_picks")
       .update({ display_order: data.display_order })
       .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+// ============ CATEGORIES & BENEFITS ============
+const slugify = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+export const adminListCategoriesAndBenefits = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const [main, saree, benefits] = await Promise.all([
+      context.supabase.from("main_categories").select("*").order("display_order"),
+      context.supabase.from("saree_categories").select("*").order("display_order"),
+      context.supabase.from("benefits").select("*").order("display_order"),
+    ]);
+    if (main.error) throw main.error;
+    if (saree.error) throw saree.error;
+    if (benefits.error) throw benefits.error;
+    return { main: main.data ?? [], saree: saree.data ?? [], benefits: benefits.data ?? [] };
+  });
+
+const categoryInput = z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(1).max(80), image_url: z.string().max(1000), display_order: z.number().int().min(0).max(1000), enabled: z.boolean(), opens_saree_categories: z.boolean().optional() });
+
+export const upsertManagedCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ kind: z.enum(["main", "saree"]), category: categoryInput }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const common = { name: data.category.name, slug: slugify(data.category.name), image_url: data.category.image_url, display_order: data.category.display_order, enabled: data.category.enabled };
+    if (data.kind === "main") {
+      const payload = { ...common, opens_saree_categories: Boolean(data.category.opens_saree_categories) };
+      if (data.category.id) {
+        const { error } = await context.supabase.from("main_categories").update(payload).eq("id", data.category.id);
+        if (error) throw error;
+        return { id: data.category.id };
+      }
+      const { data: row, error } = await context.supabase.from("main_categories").insert(payload).select("id").single();
+      if (error) throw error;
+      return { id: row.id };
+    }
+    if (data.category.id) {
+      const { error } = await context.supabase.from("saree_categories").update(common).eq("id", data.category.id);
+      if (error) throw error;
+      return { id: data.category.id };
+    }
+    const { data: row, error } = await context.supabase.from("saree_categories").insert(common).select("id").single();
+    if (error) throw error;
+    return { id: row.id };
+  });
+
+export const deleteManagedCategory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ kind: z.enum(["main", "saree"]), id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = data.kind === "main"
+      ? await context.supabase.from("main_categories").delete().eq("id", data.id)
+      : await context.supabase.from("saree_categories").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+const benefitInput = z.object({ id: z.string().uuid().optional(), name: z.string().trim().min(1).max(100), text: z.string().max(240), icon: z.string().min(1).max(40), image_url: z.string().max(1000), display_order: z.number().int().min(0).max(1000), enabled: z.boolean() });
+
+export const upsertBenefit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => benefitInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    if (data.id) {
+      const { id, ...payload } = data;
+      const { error } = await context.supabase.from("benefits").update(payload).eq("id", id);
+      if (error) throw error;
+      return { id };
+    }
+    const { data: row, error } = await context.supabase.from("benefits").insert(data).select("id").single();
+    if (error) throw error;
+    return { id: row.id };
+  });
+
+export const deleteBenefit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("benefits").delete().eq("id", data.id);
+    if (error) throw error;
+    return { ok: true };
+  });
+
+export const bulkAssignProductCategories = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ productIds: z.array(z.string().uuid()).min(1).max(500), main_category_id: z.string().uuid(), saree_category_id: z.string().uuid().nullable() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { error } = await context.supabase.from("products").update({ main_category_id: data.main_category_id, saree_category_id: data.saree_category_id }).in("id", data.productIds);
     if (error) throw error;
     return { ok: true };
   });

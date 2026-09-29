@@ -23,6 +23,7 @@ function AdminLayout() {
     { to: "/admin/branding", label: "Branding & Map" },
     { to: "/admin/slides", label: "Slides" },
     { to: "/admin/homepage", label: "Homepage sections" },
+    { to: "/admin/categories", label: "Categories & Benefits" },
     { to: "/admin/promos", label: "Promos" },
     { to: "/admin/discounts", label: "Discounts" },
     { to: "/admin/products", label: "Products" },

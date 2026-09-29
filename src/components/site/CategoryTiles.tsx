@@ -2,13 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { useRef } from "react";
 import type { ProductCardData } from "@/components/site/ProductCard";
 
-const categories = ["Katan", "Banarasi", "Kanchipuram", "Paithani"];
-
 export type CategoryTile = {
   id: string;
   name: string;
+  slug: string;
   image_url: string;
-  link_url: string | null;
+  opens_saree_categories: boolean;
 };
 
 export function CategoryTiles({
@@ -43,34 +42,22 @@ export function CategoryTiles({
           dragStart.current = null;
         }}
       >
-        {(tiles.length > 0
-          ? tiles.map((t) => ({
+        {tiles.map((t) => ({
               key: t.id,
               name: t.name,
               image: t.image_url || undefined,
-              href: t.link_url || "/shop",
-            }))
-          : categories.map((category, index) => {
-              const matchingProduct = products.find((product) =>
-                `${product.saree_type ?? ""} ${product.name}`
-                  .toLowerCase()
-                  .includes(category.toLowerCase()),
-              );
-              const fallbackProduct = products[index % Math.max(products.length, 1)];
-              return {
-                key: category,
-                name: category,
-                image: matchingProduct?.images?.[0] ?? fallbackProduct?.images?.[0],
-                href: "/shop",
-              };
-            })
-        ).map((item) => {
+               fallback: products.find((product) =>
+                 `${product.saree_type ?? ""} ${product.name}`.toLowerCase().includes(t.name.toLowerCase()),
+               )?.images?.[0],
+               slug: t.slug,
+               opensSarees: t.opens_saree_categories,
+             })).map((item) => {
           const inner = (
             <>
               <span className="grid aspect-square w-24 place-items-center overflow-hidden rounded-full border border-border bg-secondary shadow-[var(--shadow-deep)] md:w-32">
-                {item.image ? (
+                {item.image || item.fallback ? (
                   <img
-                    src={item.image}
+                    src={item.image || item.fallback}
                     alt={`${item.name} sarees`}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     draggable={false}
@@ -88,14 +75,14 @@ export function CategoryTiles({
           const cls =
             "group flex w-24 shrink-0 flex-col items-center gap-3 text-center md:w-32";
 
-          return item.href === "/shop" ? (
-            <Link key={item.key} to="/shop" draggable={false} className={cls}>
+          return item.opensSarees ? (
+            <Link key={item.key} to="/sarees" draggable={false} className={cls}>
               {inner}
             </Link>
           ) : (
-            <a key={item.key} href={item.href} draggable={false} className={cls}>
+            <Link key={item.key} to="/category/$slug" params={{ slug: item.slug }} draggable={false} className={cls}>
               {inner}
-            </a>
+            </Link>
           );
         })}
       </div>

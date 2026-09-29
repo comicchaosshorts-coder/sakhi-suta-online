@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SareesRouteImport } from './routes/sarees'
 import { Route as RegionsRouteImport } from './routes/regions'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -19,11 +20,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StateSlugRouteImport } from './routes/state.$slug'
+import { Route as SareesSlugRouteImport } from './routes/sarees.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin-setup'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiPublicMediaRouteImport } from './routes/api/public/media'
 import { Route as AuthenticatedOrderIdRouteImport } from './routes/_authenticated/order.$id'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminSlidesRouteImport } from './routes/_authenticated/admin/slides'
@@ -34,6 +38,7 @@ import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminInquiriesRouteImport } from './routes/_authenticated/admin/inquiries'
 import { Route as AuthenticatedAdminHomepageRouteImport } from './routes/_authenticated/admin/homepage'
 import { Route as AuthenticatedAdminDiscountsRouteImport } from './routes/_authenticated/admin/discounts'
+import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
 import { Route as AuthenticatedAdminBrandingRouteImport } from './routes/_authenticated/admin/branding'
 
 const ShopRoute = ShopRouteImport.update({
@@ -44,6 +49,11 @@ const ShopRoute = ShopRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SareesRoute = SareesRouteImport.update({
+  id: '/sarees',
+  path: '/sarees',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegionsRoute = RegionsRouteImport.update({
@@ -85,9 +95,19 @@ const StateSlugRoute = StateSlugRouteImport.update({
   path: '/state/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SareesSlugRoute = SareesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SareesRoute,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminSetupRoute = AuthenticatedAdminSetupRouteImport.update({
@@ -109,6 +129,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const ApiPublicMediaRoute = ApiPublicMediaRouteImport.update({
+  id: '/api/public/media',
+  path: '/api/public/media',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedOrderIdRoute = AuthenticatedOrderIdRouteImport.update({
   id: '/order/$id',
@@ -169,6 +194,12 @@ const AuthenticatedAdminDiscountsRoute =
     path: '/discounts',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminCategoriesRoute =
+  AuthenticatedAdminCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminBrandingRoute =
   AuthenticatedAdminBrandingRouteImport.update({
     id: '/branding',
@@ -183,14 +214,18 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
@@ -201,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -210,13 +246,17 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
@@ -227,6 +267,7 @@ export interface FileRoutesByTo {
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -238,14 +279,18 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
+  '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/_authenticated/admin/homepage': typeof AuthenticatedAdminHomepageRoute
   '/_authenticated/admin/inquiries': typeof AuthenticatedAdminInquiriesRoute
@@ -256,6 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -267,14 +313,18 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/admin'
     | '/account'
     | '/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/admin/branding'
+    | '/admin/categories'
     | '/admin/discounts'
     | '/admin/homepage'
     | '/admin/inquiries'
@@ -285,6 +335,7 @@ export interface FileRouteTypes {
     | '/admin/slides'
     | '/admin/testimonials'
     | '/order/$id'
+    | '/api/public/media'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -294,13 +345,17 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/account'
     | '/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/admin/branding'
+    | '/admin/categories'
     | '/admin/discounts'
     | '/admin/homepage'
     | '/admin/inquiries'
@@ -311,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin/slides'
     | '/admin/testimonials'
     | '/order/$id'
+    | '/api/public/media'
     | '/admin'
   id:
     | '__root__'
@@ -321,14 +377,18 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/_authenticated/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/_authenticated/admin/branding'
+    | '/_authenticated/admin/categories'
     | '/_authenticated/admin/discounts'
     | '/_authenticated/admin/homepage'
     | '/_authenticated/admin/inquiries'
@@ -339,6 +399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/slides'
     | '/_authenticated/admin/testimonials'
     | '/_authenticated/order/$id'
+    | '/api/public/media'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -350,10 +411,13 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   JoinRoute: typeof JoinRoute
   RegionsRoute: typeof RegionsRoute
+  SareesRoute: typeof SareesRouteWithChildren
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   StateSlugRoute: typeof StateSlugRoute
+  ApiPublicMediaRoute: typeof ApiPublicMediaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -370,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sarees': {
+      id: '/sarees'
+      path: '/sarees'
+      fullPath: '/sarees'
+      preLoaderRoute: typeof SareesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/regions': {
@@ -428,11 +499,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StateSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sarees/$slug': {
+      id: '/sarees/$slug'
+      path: '/$slug'
+      fullPath: '/sarees/$slug'
+      preLoaderRoute: typeof SareesSlugRouteImport
+      parentRoute: typeof SareesRoute
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin-setup': {
@@ -462,6 +547,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/api/public/media': {
+      id: '/api/public/media'
+      path: '/api/public/media'
+      fullPath: '/api/public/media'
+      preLoaderRoute: typeof ApiPublicMediaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/order/$id': {
       id: '/_authenticated/order/$id'
@@ -533,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDiscountsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/categories': {
+      id: '/_authenticated/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/branding': {
       id: '/_authenticated/admin/branding'
       path: '/branding'
@@ -545,6 +644,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminBrandingRoute: typeof AuthenticatedAdminBrandingRoute
+  AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminDiscountsRoute: typeof AuthenticatedAdminDiscountsRoute
   AuthenticatedAdminHomepageRoute: typeof AuthenticatedAdminHomepageRoute
   AuthenticatedAdminInquiriesRoute: typeof AuthenticatedAdminInquiriesRoute
@@ -560,6 +660,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminBrandingRoute: AuthenticatedAdminBrandingRoute,
+    AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
     AuthenticatedAdminDiscountsRoute: AuthenticatedAdminDiscountsRoute,
     AuthenticatedAdminHomepageRoute: AuthenticatedAdminHomepageRoute,
     AuthenticatedAdminInquiriesRoute: AuthenticatedAdminInquiriesRoute,
@@ -594,6 +695,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface SareesRouteChildren {
+  SareesSlugRoute: typeof SareesSlugRoute
+}
+
+const SareesRouteChildren: SareesRouteChildren = {
+  SareesSlugRoute: SareesSlugRoute,
+}
+
+const SareesRouteWithChildren =
+  SareesRoute._addFileChildren(SareesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -602,10 +714,13 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   JoinRoute: JoinRoute,
   RegionsRoute: RegionsRoute,
+  SareesRoute: SareesRouteWithChildren,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRoute,
+  CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   StateSlugRoute: StateSlugRoute,
+  ApiPublicMediaRoute: ApiPublicMediaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

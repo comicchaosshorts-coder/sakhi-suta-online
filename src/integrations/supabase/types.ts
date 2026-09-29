@@ -114,6 +114,42 @@ export type Database = {
           },
         ]
       }
+      benefits: {
+        Row: {
+          created_at: string
+          display_order: number
+          enabled: boolean
+          icon: string
+          id: string
+          image_url: string
+          name: string
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          icon?: string
+          id?: string
+          image_url?: string
+          name: string
+          text?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          icon?: string
+          id?: string
+          image_url?: string
+          name?: string
+          text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       category_tiles: {
         Row: {
           active: boolean
@@ -526,6 +562,42 @@ export type Database = {
           },
         ]
       }
+      main_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          enabled: boolean
+          id: string
+          image_url: string
+          name: string
+          opens_saree_categories: boolean
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          id?: string
+          image_url?: string
+          name: string
+          opens_saree_categories?: boolean
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          id?: string
+          image_url?: string
+          name?: string
+          opens_saree_categories?: boolean
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_status_history: {
         Row: {
           changed_by: string | null
@@ -686,10 +758,12 @@ export type Database = {
           images: string[]
           in_stock: boolean
           ironing_care: string
+          main_category_id: string | null
           name: string
           occasion: string | null
           origin: string | null
           price_inr: number
+          saree_category_id: string | null
           saree_type: string | null
           slug: string
           state_id: string | null
@@ -712,10 +786,12 @@ export type Database = {
           images?: string[]
           in_stock?: boolean
           ironing_care?: string
+          main_category_id?: string | null
           name: string
           occasion?: string | null
           origin?: string | null
           price_inr: number
+          saree_category_id?: string | null
           saree_type?: string | null
           slug: string
           state_id?: string | null
@@ -738,10 +814,12 @@ export type Database = {
           images?: string[]
           in_stock?: boolean
           ironing_care?: string
+          main_category_id?: string | null
           name?: string
           occasion?: string | null
           origin?: string | null
           price_inr?: number
+          saree_category_id?: string | null
           saree_type?: string | null
           slug?: string
           state_id?: string | null
@@ -752,6 +830,20 @@ export type Database = {
           work?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_main_category_id_fkey"
+            columns: ["main_category_id"]
+            isOneToOne: false
+            referencedRelation: "main_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_saree_category_id_fkey"
+            columns: ["saree_category_id"]
+            isOneToOne: false
+            referencedRelation: "saree_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_state_id_fkey"
             columns: ["state_id"]
@@ -855,6 +947,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saree_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          enabled: boolean
+          id: string
+          image_url: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          id?: string
+          image_url?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          enabled?: boolean
+          id?: string
+          image_url?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       site_settings: {
         Row: {

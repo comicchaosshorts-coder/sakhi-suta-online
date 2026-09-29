@@ -20,7 +20,8 @@ export const getMapSvg = createServerFn({ method: "GET" }).handler(async () => {
 
   // path is stored as "bucket/key" or just "key" in brand-assets
   const key = path.startsWith("brand-assets/") ? path.slice("brand-assets/".length) : path;
-  const { data, error } = await supabase.storage.from("brand-assets").download(key);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.storage.from("brand-assets").download(key);
   if (error || !data) return { svg: null };
   const svg = await data.text();
   return { svg };

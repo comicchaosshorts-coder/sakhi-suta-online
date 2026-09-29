@@ -5,11 +5,11 @@ import { getSiteSettings } from "@/lib/site.functions";
 import { listStates } from "@/lib/states.functions";
 import { listProducts } from "@/lib/products.functions";
 import {
-  listCategoryTiles,
   listHeroSlides,
   listHomepagePicks,
   listTestimonials,
 } from "@/lib/homepage.functions";
+import { listMainCategories } from "@/lib/categories.functions";
 import { listPromoContent } from "@/lib/promos.functions";
 import { IndiaMap } from "@/components/site/IndiaMap";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -31,7 +31,7 @@ const homeQuery = queryOptions({
         listHeroSlides(),
         listTestimonials(),
         listPromoContent(),
-        listCategoryTiles(),
+        listMainCategories(),
         listHomepagePicks(),
       ]);
     return { settings, states, products, slides, testimonials, promos, tiles, picks };

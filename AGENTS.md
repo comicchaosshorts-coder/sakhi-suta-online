@@ -1,3 +1,5 @@
+Category architecture: products keep stable identities and receive nullable relational links to admin-managed main and saree categories, because catalogue history must remain intact.
+Global benefits architecture: customer benefits are database-managed and rendered once in the root shell immediately above the footer, because changes must apply site-wide without rebuilds.
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
