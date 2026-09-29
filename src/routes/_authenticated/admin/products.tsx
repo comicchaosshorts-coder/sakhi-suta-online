@@ -3,6 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import {
   adminListProducts,
+  adminListCategoriesAndBenefits,
+  bulkAssignProductCategories,
   createProductImageUploadUrl,
   deleteProduct,
   getPublicProductImageUrl,
@@ -48,6 +50,8 @@ const emptyForm = {
   drying_care: "not_specified",
   storage_care: "not_specified",
   care_note: "",
+  main_category_id: "",
+  saree_category_id: "",
 };
 
 function newVariantId() {
@@ -58,10 +62,14 @@ function Products() {
   const qc = useQueryClient();
   const products = useQuery({ queryKey: ["admin-products"], queryFn: () => adminListProducts() });
   const states = useQuery({ queryKey: ["states"], queryFn: () => listStates() });
+  const categories = useQuery({ queryKey: ["admin-categories-benefits"], queryFn: () => adminListCategoriesAndBenefits() });
   const [form, setForm] = useState({ ...emptyForm });
   const [msg, setMsg] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [pending, setPending] = useState<PendingCrop[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkMain, setBulkMain] = useState("");
+  const [bulkSaree, setBulkSaree] = useState("");
   const addInputRef = useRef<HTMLInputElement>(null);
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const replaceIndexRef = useRef<number | null>(null);
@@ -126,6 +134,8 @@ function Products() {
           drying_care: form.drying_care,
           storage_care: form.storage_care,
           care_note: form.care_note.trim() || null,
+          main_category_id: form.main_category_id || null,
+          saree_category_id: form.saree_category_id || null,
           variants: form.variants.map((v) => ({
             id: v.id,
             name: v.name,
@@ -300,6 +310,20 @@ function Products() {
           </label>
           <Input label="Saree type" value={form.saree_type} onChange={(v) => setForm({ ...form, saree_type: v })} />
           <Input label="Fabric" value={form.fabric} onChange={(v) => setForm({ ...form, fabric: v })} />
+          <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">Main category</span>
+            <select value={form.main_category_id} onChange={(e) => { const next = e.target.value; const main = categories.data?.main.find((item) => item.id === next); setForm({ ...form, main_category_id: next, saree_category_id: main?.opens_saree_categories ? form.saree_category_id : "" }); }} className="w-full rounded-md border border-input bg-input/40 px-3 py-2">
+              <option value="">— select —</option>
+              {categories.data?.main.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          </label>
+          {categories.data?.main.find((item) => item.id === form.main_category_id)?.opens_saree_categories && <label className="block">
+            <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">Saree category</span>
+            <select value={form.saree_category_id} onChange={(e) => setForm({ ...form, saree_category_id: e.target.value })} className="w-full rounded-md border border-input bg-input/40 px-3 py-2">
+              <option value="">— select —</option>
+              {categories.data?.saree.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          </label>}
           <div className="block">
             <span className="mb-1 block text-xs uppercase tracking-widest text-muted-foreground">
               Catalogue images
@@ -635,9 +659,18 @@ function Products() {
 
       <div>
         <h2 className="font-serif text-2xl">All products</h2>
+        <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
+          <p className="text-sm font-medium">Bulk category assignment · {selectedIds.length} selected</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <select value={bulkMain} onChange={(e) => { setBulkMain(e.target.value); setBulkSaree(""); }} className="min-w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"><option value="">Main category</option>{categories.data?.main.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
+            {categories.data?.main.find((item) => item.id === bulkMain)?.opens_saree_categories && <select value={bulkSaree} onChange={(e) => setBulkSaree(e.target.value)} className="min-w-40 rounded-md border border-input bg-background px-3 py-2 text-sm"><option value="">Saree category</option>{categories.data?.saree.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select>}
+            <button disabled={!bulkMain || selectedIds.length === 0} onClick={async () => { await bulkAssignProductCategories({ data: { productIds: selectedIds, main_category_id: bulkMain, saree_category_id: bulkSaree || null } }); setSelectedIds([]); setMsg("Categories assigned."); qc.invalidateQueries({ queryKey: ["admin-products"] }); }} className="rounded-full bg-primary px-5 py-2 text-sm text-primary-foreground disabled:opacity-50">Assign Category</button>
+          </div>
+        </div>
         <div className="mt-4 space-y-3">
           {products.data?.map((p) => (
             <div key={p.id} className="flex items-center gap-4 rounded-xl glass p-4">
+              <input type="checkbox" aria-label={`Select ${p.name}`} checked={selectedIds.includes(p.id)} onChange={(e) => setSelectedIds((current) => e.target.checked ? [...current, p.id] : current.filter((id) => id !== p.id))} />
               <div className="h-16 w-14 shrink-0 overflow-hidden rounded-md bg-secondary">
                 {p.images?.[0] && <img src={p.images[0]} alt="" className="h-full w-full object-cover" />}
               </div>
@@ -680,6 +713,8 @@ function Products() {
                     drying_care: (p as any).drying_care ?? "not_specified",
                     storage_care: (p as any).storage_care ?? "not_specified",
                     care_note: (p as any).care_note ?? "",
+                    main_category_id: (p as any).main_category_id ?? "",
+                    saree_category_id: (p as any).saree_category_id ?? "",
                   })
                 }
                 className="rounded-full border border-border/60 px-3 py-1 text-xs hover:text-primary"
