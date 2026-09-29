@@ -115,3 +115,5 @@ export const listHomepagePicks = createServerFn({ method: "GET" }).handler(async
   if (error) throw error;
   return data ?? [];
 });
+
+export { listMainCategories } from "./categories.functions";

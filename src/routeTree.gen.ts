@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SareesRouteImport } from './routes/sarees'
 import { Route as RegionsRouteImport } from './routes/regions'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -19,7 +20,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StateSlugRouteImport } from './routes/state.$slug'
+import { Route as SareesSlugRouteImport } from './routes/sarees.$slug'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin-setup'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
@@ -44,6 +47,11 @@ const ShopRoute = ShopRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SareesRoute = SareesRouteImport.update({
+  id: '/sarees',
+  path: '/sarees',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegionsRoute = RegionsRouteImport.update({
@@ -85,9 +93,19 @@ const StateSlugRoute = StateSlugRouteImport.update({
   path: '/state/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SareesSlugRoute = SareesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => SareesRoute,
+} as any)
 const ProductSlugRoute = ProductSlugRouteImport.update({
   id: '/product/$slug',
   path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategorySlugRoute = CategorySlugRouteImport.update({
+  id: '/category/$slug',
+  path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminSetupRoute = AuthenticatedAdminSetupRouteImport.update({
@@ -183,12 +201,15 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -210,11 +231,14 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -238,12 +262,15 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/join': typeof JoinRoute
   '/regions': typeof RegionsRoute
+  '/sarees': typeof SareesRouteWithChildren
   '/search': typeof SearchRoute
   '/shop': typeof ShopRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin-setup': typeof AuthenticatedAdminSetupRoute
+  '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
+  '/sarees/$slug': typeof SareesSlugRoute
   '/state/$slug': typeof StateSlugRoute
   '/_authenticated/admin/branding': typeof AuthenticatedAdminBrandingRoute
   '/_authenticated/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
@@ -267,12 +294,15 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/admin'
     | '/account'
     | '/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/admin/branding'
     | '/admin/discounts'
@@ -294,11 +324,14 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/account'
     | '/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/admin/branding'
     | '/admin/discounts'
@@ -321,12 +354,15 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/join'
     | '/regions'
+    | '/sarees'
     | '/search'
     | '/shop'
     | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/_authenticated/admin-setup'
+    | '/category/$slug'
     | '/product/$slug'
+    | '/sarees/$slug'
     | '/state/$slug'
     | '/_authenticated/admin/branding'
     | '/_authenticated/admin/discounts'
@@ -350,8 +386,10 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   JoinRoute: typeof JoinRoute
   RegionsRoute: typeof RegionsRoute
+  SareesRoute: typeof SareesRouteWithChildren
   SearchRoute: typeof SearchRoute
   ShopRoute: typeof ShopRoute
+  CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   StateSlugRoute: typeof StateSlugRoute
 }
@@ -370,6 +408,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sarees': {
+      id: '/sarees'
+      path: '/sarees'
+      fullPath: '/sarees'
+      preLoaderRoute: typeof SareesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/regions': {
@@ -428,11 +473,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StateSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sarees/$slug': {
+      id: '/sarees/$slug'
+      path: '/$slug'
+      fullPath: '/sarees/$slug'
+      preLoaderRoute: typeof SareesSlugRouteImport
+      parentRoute: typeof SareesRoute
+    }
     '/product/$slug': {
       id: '/product/$slug'
       path: '/product/$slug'
       fullPath: '/product/$slug'
       preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$slug': {
+      id: '/category/$slug'
+      path: '/category/$slug'
+      fullPath: '/category/$slug'
+      preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin-setup': {
@@ -594,6 +653,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface SareesRouteChildren {
+  SareesSlugRoute: typeof SareesSlugRoute
+}
+
+const SareesRouteChildren: SareesRouteChildren = {
+  SareesSlugRoute: SareesSlugRoute,
+}
+
+const SareesRouteWithChildren =
+  SareesRoute._addFileChildren(SareesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -602,8 +672,10 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   JoinRoute: JoinRoute,
   RegionsRoute: RegionsRoute,
+  SareesRoute: SareesRouteWithChildren,
   SearchRoute: SearchRoute,
   ShopRoute: ShopRoute,
+  CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   StateSlugRoute: StateSlugRoute,
 }
