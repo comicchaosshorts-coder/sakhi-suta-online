@@ -27,6 +27,7 @@ import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiPublicMediaRouteImport } from './routes/api/public/media'
 import { Route as AuthenticatedOrderIdRouteImport } from './routes/_authenticated/order.$id'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminSlidesRouteImport } from './routes/_authenticated/admin/slides'
@@ -129,6 +130,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const ApiPublicMediaRoute = ApiPublicMediaRouteImport.update({
+  id: '/api/public/media',
+  path: '/api/public/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedOrderIdRoute = AuthenticatedOrderIdRouteImport.update({
   id: '/order/$id',
   path: '/order/$id',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/slides': typeof AuthenticatedAdminSlidesRoute
   '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/order/$id': typeof AuthenticatedOrderIdRoute
+  '/api/public/media': typeof ApiPublicMediaRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/admin/slides'
     | '/admin/testimonials'
     | '/order/$id'
+    | '/api/public/media'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -356,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin/slides'
     | '/admin/testimonials'
     | '/order/$id'
+    | '/api/public/media'
     | '/admin'
   id:
     | '__root__'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/slides'
     | '/_authenticated/admin/testimonials'
     | '/_authenticated/order/$id'
+    | '/api/public/media'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -405,6 +417,7 @@ export interface RootRouteChildren {
   CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
   StateSlugRoute: typeof StateSlugRoute
+  ApiPublicMediaRoute: typeof ApiPublicMediaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -534,6 +547,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/api/public/media': {
+      id: '/api/public/media'
+      path: '/api/public/media'
+      fullPath: '/api/public/media'
+      preLoaderRoute: typeof ApiPublicMediaRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/order/$id': {
       id: '/_authenticated/order/$id'
@@ -700,6 +720,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
   StateSlugRoute: StateSlugRoute,
+  ApiPublicMediaRoute: ApiPublicMediaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
