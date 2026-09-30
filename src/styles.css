@@ -86,6 +86,8 @@
   --gradient-luxe: linear-gradient(160deg, oklch(0.985 0.012 85) 0%, oklch(0.96 0.02 60) 55%, oklch(0.99 0.006 90) 100%);
   --shadow-gold: 0 18px 45px -22px oklch(0.37 0.15 15 / 0.45);
   --shadow-deep: 0 24px 60px -30px oklch(0.30 0.05 40 / 0.30);
+  --category-card-overlay: linear-gradient(90deg, oklch(0.13 0.03 25 / 0.72), oklch(0.13 0.03 25 / 0.38), oklch(0.13 0.03 25 / 0.68));
+  --category-card-fallback: repeating-linear-gradient(135deg, color-mix(in oklab, var(--primary) 72%, var(--foreground)) 0 2px, color-mix(in oklab, var(--primary) 82%, var(--foreground)) 2px 18px, color-mix(in oklab, var(--gold) 42%, var(--primary)) 18px 20px);
 }
 
 .dark {
@@ -124,6 +126,14 @@
 
 @utility gold-border {
   border: 1px solid color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
+@utility category-card-overlay {
+  background: var(--category-card-overlay);
+}
+
+@utility category-card-fallback {
+  background: var(--category-card-fallback);
 }
 
 @utility tilt-card {
