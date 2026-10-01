@@ -48,9 +48,9 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
         drag.current = null;
       }}
     >
-      <div className="relative aspect-[4/5] w-full sm:aspect-[16/9] lg:aspect-[21/9]">
+      <div className="relative w-full">
         <div
-          className="flex h-full w-full transition-transform duration-700 ease-out"
+          className="flex w-full items-start transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${i * 100}%)` }}
         >
           {slides.map((s, idx) => {
@@ -58,13 +58,15 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
             const showText = s.banner_type !== "image_only";
             const heading = s.title || s.caption;
             return (
-              <div key={s.id} className="relative h-full w-full shrink-0 grow-0 basis-full">
+              <div key={s.id} className="relative w-full shrink-0 grow-0 basis-full">
                 <img
                   src={src}
                   alt={heading ?? "Sakhi Suta banner"}
                   loading={idx === 0 ? "eager" : "lazy"}
+                  fetchPriority={idx === 0 ? "high" : "auto"}
+                  decoding="async"
                   draggable={false}
-                  className="h-full w-full object-cover object-center"
+                  className="block h-auto w-full object-contain"
                 />
                 {showText && (heading || s.description || s.button_text) && (
                   <>

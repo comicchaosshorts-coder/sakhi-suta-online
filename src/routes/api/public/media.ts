@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/public/media")({
         return new Response(data, {
           headers: {
             "Content-Type": data.type || "application/octet-stream",
-            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
             "X-Content-Type-Options": "nosniff",
           },
         });
