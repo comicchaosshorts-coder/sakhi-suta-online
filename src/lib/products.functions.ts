@@ -1,6 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createPublicClient, resolveImages } from "./supabase-public.server";
+import { createPublicClient, resolveImage, resolveImages } from "./supabase-public.server";
+
+async function resolveCardImage(imageRefs: string[] | null, supabase: ReturnType<typeof createPublicClient>) {
+  const firstImage = imageRefs?.[0];
+  return firstImage ? [await resolveImage(supabase, firstImage)] : [];
+}
 
 export const listProducts = createServerFn({ method: "GET" })
   .inputValidator((input) =>
@@ -23,7 +28,7 @@ export const listProducts = createServerFn({ method: "GET" })
     const { data: rows, error } = await q;
     if (error) throw error;
     return await Promise.all(
-      (rows ?? []).map(async (r) => ({ ...r, images: await resolveImages(supabase, r.images) })),
+      (rows ?? []).map(async (r) => ({ ...r, images: await resolveCardImage(r.images, supabase) })),
     );
   });
 
@@ -62,6 +67,6 @@ export const searchProducts = createServerFn({ method: "GET" })
       .eq("in_stock", true)
       .limit(12);
     return await Promise.all(
-      (rows ?? []).map(async (r) => ({ ...r, images: await resolveImages(supabase, r.images) })),
+      (rows ?? []).map(async (r) => ({ ...r, images: await resolveCardImage(r.images, supabase) })),
     );
   });

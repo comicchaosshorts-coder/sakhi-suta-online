@@ -31,6 +31,7 @@ export function AutoImage({
         src={src}
         alt={alt}
         loading={loading}
+        decoding="async"
         onLoad={(e) => {
           const t = e.currentTarget;
           if (t.naturalWidth && t.naturalHeight) {

@@ -121,6 +121,8 @@ export function Coverflow3D({ products }: Props) {
                 <img
                   src={img}
                   alt={p.name}
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover"
                   draggable={false}
                 />

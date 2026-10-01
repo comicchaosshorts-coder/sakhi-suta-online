@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createPublicClient, resolveImage, resolveImages } from "./supabase-public.server";
+import { createPublicClient, resolveImage } from "./supabase-public.server";
 
 export const listMainCategories = createServerFn({ method: "GET" }).handler(async () => {
   const supabase = createPublicClient();
@@ -73,9 +73,12 @@ export const getCategoryProducts = createServerFn({ method: "GET" })
     return {
       main,
       sareeCategory,
-      products: await Promise.all((products ?? []).map(async (row) => ({
-        ...row,
-        images: await resolveImages(supabase, row.images),
-      }))),
+      products: await Promise.all((products ?? []).map(async (row) => {
+        const firstImage = row.images?.[0];
+        return {
+          ...row,
+          images: firstImage ? [await resolveImage(supabase, firstImage)] : [],
+        };
+      })),
     };
   });
