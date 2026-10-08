@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ADD COLUMN social_widget jsonb NOT NULL DEFAULT '{"enabled":true,"position":"left","whatsapp":{"enabled":false,"url":""},"facebook":{"enabled":false,"url":""},"instagram":{"enabled":true,"url":"https://www.instagram.com/sakhisutaofficial?igsh=NmFzMzQzZjZ1M3Js"}}'::jsonb;
+COMMENT ON COLUMN public.site_settings.social_widget IS 'Customer social launcher configuration, edited through existing admin-only site settings policies.';

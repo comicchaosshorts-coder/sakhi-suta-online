@@ -6,6 +6,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -14,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { BenefitsSection } from "@/components/site/BenefitsSection";
+import { SocialLauncher } from "@/components/site/SocialLauncher";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -38,7 +40,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -141,6 +143,7 @@ function RootComponent() {
         </main>
         <BenefitsSection />
         <Footer />
+        <SocialLauncher />
       </div>
     </QueryClientProvider>
   );

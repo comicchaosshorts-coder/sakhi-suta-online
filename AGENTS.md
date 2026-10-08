@@ -2,6 +2,7 @@ Category architecture: products keep stable identities and receive nullable rela
 Global benefits architecture: customer benefits are database-managed and rendered once in the root shell immediately above the footer, because changes must apply site-wide without rebuilds.
 Saree route architecture: `/sarees` is an Outlet layout with an index category grid and `$slug` product-listing child, so tile navigation renders correctly.
 Saree category visuals reuse `saree_categories.image_url` as the editorial card background, keeping admin uploads and customer presentation on one record.
+Social launcher architecture: mount once in the root shell, hide on admin paths, and reuse the site settings query and admin-validated configuration so navigation cannot duplicate it or create separate settings systems.
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
