@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { CARE_VALUES } from "@/lib/product-care-values";
+import { socialSettingsSchema } from "@/lib/social-settings";
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
@@ -55,6 +56,7 @@ export const updateSiteSettings = createServerFn({ method: "POST" })
         color_accent: z.string().max(30).optional(),
         logo_url: z.string().max(500).optional().nullable(),
         map_svg_url: z.string().max(500).optional().nullable(),
+        social_widget: socialSettingsSchema.optional(),
       })
       .parse(i),
   )

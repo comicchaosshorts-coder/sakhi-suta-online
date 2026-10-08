@@ -3,8 +3,18 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getSiteSettings } from "@/lib/site.functions";
 import { updateSiteSettings, uploadMapSvg } from "@/lib/admin.functions";
+import { SocialSettingsEditor } from "@/components/site/SocialSettingsEditor";
+import { parseSocialSettings } from "@/lib/social-settings";
 
 export const Route = createFileRoute("/_authenticated/admin/branding")({
+  head: () => ({ meta: [
+    { title: "Branding & Social Settings — Sakhi Suta" },
+    { name: "description", content: "Manage Sakhi Suta branding, India map, and official social links." },
+    { property: "og:title", content: "Branding & Social Settings — Sakhi Suta" },
+    { property: "og:description", content: "Manage Sakhi Suta branding and official social links." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Branding,
 });
 
@@ -16,6 +26,7 @@ function Branding() {
   const [tagline, setTagline] = useState("");
 
   const s = q.data;
+  const social = parseSocialSettings(s?.social_widget);
   if (s && brand === "" && s.brand_name) {
     // seed once
     setBrand(s.brand_name);
@@ -92,6 +103,7 @@ function Branding() {
         )}
       </div>
 
+      {social && <SocialSettingsEditor key={JSON.stringify(social)} initial={social} />}
       {msg && <p className="text-sm text-primary">{msg}</p>}
     </div>
   );
