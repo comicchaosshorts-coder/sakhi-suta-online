@@ -991,6 +991,7 @@ export type Database = {
           logo_url: string | null
           map_svg_url: string | null
           promo_banner_url: string | null
+          social_widget: Json
           tagline: string
           updated_at: string
         }
@@ -1003,6 +1004,7 @@ export type Database = {
           logo_url?: string | null
           map_svg_url?: string | null
           promo_banner_url?: string | null
+          social_widget?: Json
           tagline?: string
           updated_at?: string
         }
@@ -1015,6 +1017,7 @@ export type Database = {
           logo_url?: string | null
           map_svg_url?: string | null
           promo_banner_url?: string | null
+          social_widget?: Json
           tagline?: string
           updated_at?: string
         }
