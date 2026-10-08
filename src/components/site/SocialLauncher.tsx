@@ -47,7 +47,12 @@ export function SocialLauncher() {
         const width = window.innerWidth;
         const viewHeight = window.visualViewport?.height ?? window.innerHeight;
         const safeBottom = Number.parseFloat(getComputedStyle(root.current ?? document.documentElement).getPropertyValue("--social-safe-bottom")) || 0;
-        const obstacles = Array.from(document.querySelectorAll<HTMLElement>("button, input, textarea, select, a, [role='dialog']")).filter((el) => !root.current?.contains(el) && el.getClientRects().length > 0).map((el) => el.getBoundingClientRect());
+        const obstacles = Array.from(document.querySelectorAll<HTMLElement>("button, input, textarea, select, a, [role='dialog']")).filter((el) => {
+          if (root.current?.contains(el) || el.getClientRects().length === 0) return false;
+          if (el.tagName !== "A") return true;
+          const position = getComputedStyle(el).position;
+          return position === "fixed" || position === "sticky" || /checkout|buy now|add to cart|payment|support|whatsapp/i.test(`${el.textContent} ${el.getAttribute("aria-label")}`);
+        }).map((el) => el.getBoundingClientRect());
         const preferred = settings?.position ?? "left";
         for (let bottom = 16; bottom < Math.max(32, viewHeight - height - 96); bottom += 64) {
           for (const side of [preferred, preferred === "left" ? "right" : "left"]) {
