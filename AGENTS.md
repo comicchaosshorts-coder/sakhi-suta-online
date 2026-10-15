@@ -6,6 +6,7 @@ Social launcher architecture: mount once in the root shell, hide on admin paths,
 Image delivery: use bounded native storage width transforms through the existing media endpoint, preserve originals, and cache only unique upload keys immutably because admin replacements use new keys.
 Banner sizing: read original image headers server-side and use picture source dimensions and matching responsive preload hints so mobile selection and reserved space are correct before hydration.
 Announcement loading: preload the shared promo-content query in the root loader and reuse it on the homepage so the announcement bar does not appear late or fetch twice.
+Query SSR: dehydrate and hydrate the per-request QueryClient through router hooks so rendered server data survives hydration without duplicate requests or disappearing content.
 <!-- LOVABLE:BEGIN -->
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting

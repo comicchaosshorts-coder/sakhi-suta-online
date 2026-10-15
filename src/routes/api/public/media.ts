@@ -19,15 +19,25 @@ export const Route = createFileRoute("/api/public/media")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const storage = supabaseAdmin.storage.from(bucket);
-        let { data, error } = await storage.download(key, width ? {
-          transform: { width, resize: "contain", quality: 85 },
-        } : undefined);
-        let fallback = false;
-        if (width && (error || !data)) {
-          ({ data, error } = await storage.download(key));
-          fallback = true;
+        let data: Blob | null = null;
+        const base = process.env.SUPABASE_URL;
+        const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (width && base && secret) {
+          try {
+            const transformed = await fetch(`${base}/storage/v1/render/image/authenticated/${bucket}/${key.split("/").map(encodeURIComponent).join("/")}?width=${width}&resize=contain&quality=85`, {
+              headers: { apikey: secret, Authorization: `Bearer ${secret}`, Accept: "image/webp" },
+              signal: AbortSignal.timeout(5000),
+            });
+            if (transformed.ok) data = await transformed.blob();
+          } catch { /* Keep original delivery working if resizing is unavailable. */ }
         }
-        if (error || !data) return new Response("Not found", { status: 404 });
+        let fallback = false;
+        if (!data) {
+          const original = await storage.download(key);
+          data = original.data;
+          fallback = width !== undefined;
+        }
+        if (!data) return new Response("Not found", { status: 404 });
 
         // Admin uploads use unique timestamp keys; replacements receive new URLs.
         const versioned = /^\d{13}-/.test(key);
