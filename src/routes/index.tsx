@@ -27,7 +27,7 @@ const homeQuery = queryOptions({
   queryKey: ["home"],
   staleTime: 300000,
   queryFn: async () => {
-    const [settings, states, products, slides, testimonials, promos, tiles, picks] =
+    const [settings, states, products, slides, testimonials, tiles, picks] =
       await Promise.all([
         getSiteSettings(),
         listStates(),
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
         imageSrcSet: imageSrcSet(loaderData.slides[0].image_url, [480, 720, 1080, 1440, 1920]), imageSizes: "100vw",
         media: loaderData.slides[0].mobile_image_url ? "(min-width: 768px)" : undefined, fetchPriority: "high" },
       ...(loaderData.slides[0].mobile_image_url ? [{ rel: "preload", as: "image", href: imageVariant(loaderData.slides[0].mobile_image_url, 720),
-        imageSrcSet: imageSrcSet(loaderData.slides[0].mobile_image_url, [480, 720, 1080]), imageSizes: "100vw", media: "(max-width: 767px)", fetchPriority: "high" }] : []),
+        imageSrcSet: imageSrcSet(loaderData.slides[0].mobile_image_url, [480, 720, 1080]), imageSizes: "100vw", media: "(max-width: 767px)", fetchPriority: "high" as const }] : []),
     ] : [],
     meta: [
       { title: "Sakhi Suta — Handcrafted Indian Ethnic Wear & Handloom Sarees" },
