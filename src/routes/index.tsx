@@ -42,6 +42,10 @@ const homeQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/")({
+  loader: async ({ context }) => {
+    const [home] = await Promise.all([context.queryClient.ensureQueryData(homeQuery), context.queryClient.ensureQueryData(promosQuery)]);
+    return home;
+  },
   head: ({ loaderData }) => ({
     links: loaderData?.slides[0] ? [
       { rel: "preload", as: "image", href: imageVariant(loaderData.slides[0].image_url, 1440),
@@ -69,10 +73,6 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: async ({ context }) => {
-    const [home] = await Promise.all([context.queryClient.ensureQueryData(homeQuery), context.queryClient.ensureQueryData(promosQuery)]);
-    return home;
-  },
   component: Home,
 });
 
