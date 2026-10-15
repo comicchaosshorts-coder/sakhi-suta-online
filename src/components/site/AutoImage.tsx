@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { imageSrcSet } from "@/lib/responsive-images";
 
 /**
  * Image that adopts the natural aspect ratio of the source, so nothing is cropped.
@@ -29,6 +30,8 @@ export function AutoImage({
     >
       <img
         src={src}
+        srcSet={imageSrcSet(src, [320, 480, 640, 960])}
+        sizes="(min-width: 1280px) 296px, (min-width: 768px) 25vw, 50vw"
         alt={alt}
         loading={loading}
         decoding="async"

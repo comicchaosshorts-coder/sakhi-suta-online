@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatINR } from "@/lib/format";
 import type { ProductCardData } from "@/components/site/ProductCard";
+import { imageSrcSet } from "@/lib/responsive-images";
 
 type Props = { products: ProductCardData[] };
 
@@ -120,6 +121,8 @@ export function Coverflow3D({ products }: Props) {
               {img ? (
                 <img
                   src={img}
+                  srcSet={imageSrcSet(img, [320, 480, 640])}
+                  sizes="(min-width: 768px) 220px, 170px"
                   alt={p.name}
                   loading="lazy"
                   decoding="async"

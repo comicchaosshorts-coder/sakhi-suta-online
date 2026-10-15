@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { imageSrcSet, imageVariant } from "@/lib/responsive-images";
 
 export type BannerSlide = {
   id: string;
@@ -12,10 +12,11 @@ export type BannerSlide = {
   button_link: string | null;
   banner_type: string;
   link_url: string | null;
+  image_dimensions?: { width: number; height: number } | null;
+  mobile_image_dimensions?: { width: number; height: number } | null;
 };
 
 export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
-  const isMobile = useIsMobile();
   const [i, setI] = useState(0);
   const drag = useRef<number | null>(null);
   const count = slides.length;
@@ -54,13 +55,26 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
           style={{ transform: `translateX(-${i * 100}%)` }}
         >
           {slides.map((s, idx) => {
-            const src = (isMobile ? s.mobile_image_url || s.image_url : s.image_url) || "";
+            const src = s.image_url || "";
             const showText = s.banner_type !== "image_only";
             const heading = s.title || s.caption;
             return (
               <div key={s.id} className="relative w-full shrink-0 grow-0 basis-full">
+                <picture>
+                  {s.mobile_image_url && (
+                    <source media="(max-width: 767px)"
+                      srcSet={imageSrcSet(s.mobile_image_url, [480, 720, 1080]) || s.mobile_image_url}
+                      sizes="100vw"
+                      width={s.mobile_image_dimensions?.width}
+                      height={s.mobile_image_dimensions?.height}
+                    />
+                  )}
                 <img
-                  src={src}
+                  src={imageVariant(src, 1440)}
+                  srcSet={imageSrcSet(src, [480, 720, 1080, 1440, 1920])}
+                  sizes="100vw"
+                  width={s.image_dimensions?.width}
+                  height={s.image_dimensions?.height}
                   alt={heading ?? "Sakhi Suta banner"}
                   loading={idx === 0 ? "eager" : "lazy"}
                   fetchPriority={idx === 0 ? "high" : "auto"}
@@ -68,6 +82,7 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
                   draggable={false}
                   className="block h-auto w-full object-contain"
                 />
+                </picture>
                 {showText && (heading || s.description || s.button_text) && (
                   <>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
