@@ -17,6 +17,7 @@ import { Footer } from "@/components/site/Footer";
 import { BenefitsSection } from "@/components/site/BenefitsSection";
 import { SocialLauncher } from "@/components/site/SocialLauncher";
 import { supabase } from "@/integrations/supabase/client";
+import { listPromoContent } from "@/lib/promos.functions";
 
 function NotFoundComponent() {
   return (
@@ -77,6 +78,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: ({ context }) => context.queryClient.ensureQueryData({
+    queryKey: ["promo-content"], queryFn: () => listPromoContent(), staleTime: 300000,
+  }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },

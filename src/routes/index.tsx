@@ -19,27 +19,41 @@ import { Coverflow3D } from "@/components/site/Coverflow3D";
 import { OfferMarquee } from "@/components/site/OfferMarquee";
 import { UspStrip } from "@/components/site/UspStrip";
 import { CategoryTiles } from "@/components/site/CategoryTiles";
+import { imageSrcSet, imageVariant } from "@/lib/responsive-images";
+
+const promosQuery = queryOptions({ queryKey: ["promo-content"], queryFn: () => listPromoContent(), staleTime: 300000 });
 
 const homeQuery = queryOptions({
   queryKey: ["home"],
+  staleTime: 300000,
   queryFn: async () => {
-    const [settings, states, products, slides, testimonials, promos, tiles, picks] =
+    const [settings, states, products, slides, testimonials, tiles, picks] =
       await Promise.all([
         getSiteSettings(),
         listStates(),
         listProducts({ data: {} }),
         listHeroSlides(),
         listTestimonials(),
-        listPromoContent(),
         listMainCategories(),
         listHomepagePicks(),
       ]);
-    return { settings, states, products, slides, testimonials, promos, tiles, picks };
+    return { settings, states, products, slides, testimonials, tiles, picks };
   },
 });
 
 export const Route = createFileRoute("/")({
-  head: () => ({
+  loader: async ({ context }) => {
+    const [home] = await Promise.all([context.queryClient.ensureQueryData(homeQuery), context.queryClient.ensureQueryData(promosQuery)]);
+    return home;
+  },
+  head: ({ loaderData }) => ({
+    links: loaderData?.slides[0] ? [
+      { rel: "preload", as: "image", href: imageVariant(loaderData.slides[0].image_url, 1440),
+        imageSrcSet: imageSrcSet(loaderData.slides[0].image_url, [480, 720, 1080, 1440, 1920]), imageSizes: "100vw",
+        media: loaderData.slides[0].mobile_image_url ? "(min-width: 768px)" : undefined, fetchPriority: "high" },
+      ...(loaderData.slides[0].mobile_image_url ? [{ rel: "preload", as: "image", href: imageVariant(loaderData.slides[0].mobile_image_url, 720),
+        imageSrcSet: imageSrcSet(loaderData.slides[0].mobile_image_url, [480, 720, 1080]), imageSizes: "100vw", media: "(max-width: 767px)", fetchPriority: "high" as const }] : []),
+    ] : [],
     meta: [
       { title: "Sakhi Suta — Handcrafted Indian Ethnic Wear & Handloom Sarees" },
       {
@@ -59,13 +73,13 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery),
   component: Home,
 });
 
 function Home() {
   const { data } = useSuspenseQuery(homeQuery);
-  const { settings, states, products, slides, testimonials, promos, tiles, picks } = data;
+  const { settings, states, products, slides, testimonials, tiles, picks } = data;
+  const { data: promos } = useSuspenseQuery(promosQuery);
 
   const tagline = settings?.tagline ?? "Elegance Woven in Every Thread";
   const brand = settings?.brand_name ?? "Sakhi Suta";

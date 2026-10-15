@@ -14,14 +14,16 @@ export const listHeroSlides = createServerFn({ method: "GET" }).handler(async ()
     .order("display_order", { ascending: true });
   if (error) throw error;
   const rows = data ?? [];
+  const { getImageDimensions } = await import("./image-dimensions.server");
   return await Promise.all(
-    rows.map(async (r) => ({
-      ...r,
-      image_url: await resolveImage(supabase, r.image_url),
-      mobile_image_url: r.mobile_image_url
-        ? await resolveImage(supabase, r.mobile_image_url)
-        : null,
-    })),
+    rows.map(async (r) => {
+      const image_url = await resolveImage(supabase, r.image_url);
+      const mobile_image_url = r.mobile_image_url ? await resolveImage(supabase, r.mobile_image_url) : null;
+      const [image_dimensions, mobile_image_dimensions] = await Promise.all([
+        getImageDimensions(image_url), mobile_image_url ? getImageDimensions(mobile_image_url) : null,
+      ]);
+      return { ...r, image_url, mobile_image_url, image_dimensions, mobile_image_dimensions };
+    }),
   );
 });
 
