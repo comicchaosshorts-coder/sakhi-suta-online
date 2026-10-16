@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Correct only the router hydration type error and confirm the automatic compilation check succeeds.
+- [x] Correct only the router hydration type error and confirm the automatic compilation check succeeds.
 
 - [ ] Fix measured banner discovery delays and image-driven layout shifts without design changes.
 - [ ] Deliver responsive storage images and safe version-aware caching.
